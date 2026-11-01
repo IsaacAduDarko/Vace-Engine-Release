@@ -1,0 +1,115 @@
+VACE Engine License
+Copyright (c) 2026 Vanta Games. All rights reserved.
+
+This document sets out the terms under which you may use the VACE Engine
+("VACE" or "the engine"). By downloading, installing, or using VACE, you
+agree to these terms.
+
+============================================================
+1. WHAT YOU CAN DO
+============================================================
+
+You may:
+
+  - Download and install VACE for free.
+  - Use VACE to build games and other software, for personal or
+    commercial purposes, at no cost.
+  - Ship games built with VACE, in any quantity, without paying
+    royalties or licensing fees to Vanta Games.
+  - Read the engine headers that ship with the release, and use them
+    to write scripts and plugins against the documented API.
+  - Redistribute complete, unmodified copies of the VACE release
+    package, provided this license file travels with the copy and
+    nothing else in the package is changed.
+
+============================================================
+2. WHAT YOU CANNOT DO
+============================================================
+
+You may not:
+
+  - Redistribute, sublicense, or publish the VACE engine, editor,
+    runtime, or its libraries as a standalone product, modified or
+    unmodified, unless it is a full unmodified release package as
+    described in section 1.
+  - Modify, reverse engineer, decompile, or disassemble the engine
+    binaries, except to the extent permitted by applicable law.
+  - Use the VACE name, logo, or Vanta Games name or logo to imply
+    endorsement of your product without prior written permission.
+  - Use the VACE source code (to the extent any is provided in
+    headers) to build a competing engine or a derivative runtime.
+
+============================================================
+3. GAMES YOU BUILD
+============================================================
+
+Games, tools, and other software that you build with VACE are yours.
+You own them. Vanta Games claims no rights to them, no revenue share,
+and no attribution requirement. You do not need to credit VACE in
+your product, though it is appreciated.
+
+You are solely responsible for the content of your games and for
+compliance with any laws, platform rules, or third party licenses
+that apply to them.
+
+============================================================
+4. THIRD PARTY COMPONENTS
+============================================================
+
+VACE uses third party libraries, including (but not limited to) Jolt
+Physics, Box2D, OpenGL-related libraries, audio libraries, and JSON
+libraries. Each is distributed under its own license. Those licenses
+continue to apply to those components. Where a third party license
+conflicts with this document, the third party license governs for
+that component only.
+
+============================================================
+5. NO WARRANTY
+============================================================
+
+VACE is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of
+merchantability, fitness for a particular purpose, and
+noninfringement. Vanta Games does not warrant that VACE will be
+error-free, uninterrupted, or fit for any specific use.
+
+============================================================
+6. LIMITATION OF LIABILITY
+============================================================
+
+In no event shall Vanta Games, its developers, or contributors be
+liable for any claim, damages, or other liability, whether in an
+action of contract, tort, or otherwise, arising from, out of, or in
+connection with VACE or the use or other dealings in VACE.
+
+This includes, without limitation, lost profits, lost data, or
+business interruption, even if Vanta Games has been advised of the
+possibility of such damages.
+
+============================================================
+7. FUTURE VERSIONS
+============================================================
+
+Vanta Games intends to keep VACE free for as long as the project
+receives enough support from its users. If that changes, existing
+releases will remain available under the terms they were released
+with, and any licensing change will be announced clearly in the
+release notes before it takes effect for new releases.
+
+============================================================
+8. CONTACT
+============================================================
+
+For licensing questions, permission requests, or anything else
+covered by this document, contact:
+
+  Isaac Adu Darko
+  Vanta Games
+  isaacadudarko1@gmail.com
+
+Discord: https://discord.gg/vjYZsQzuMq
+GitHub:  https://github.com/IsaacAduDarko
+
+============================================================
+END OF LICENSE
+============================================================
