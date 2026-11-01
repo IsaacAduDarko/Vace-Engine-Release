@@ -16,6 +16,8 @@ The first stable release of VACE. Editor, runtime, and bundled documentation, in
 
 ## Download
 
+## Download link - https://github.com/IsaacAduDarko/Vace-Engine-Release/releases/tag/Vace-Engine
+
 **`vace_engine_windows_stable_v0.1.zip`** — the full engine, editor, runtime, and bundled documentation. Extract it anywhere you can write to, then run `build\windows-mingw-debug\projectmanager\VACE_ProjectManager.exe` to get started.
 
 Optional: **MinGW-w64** if you plan to write C++ scripts. The release's Project Manager handles the setup, adding the compiler to your PATH and configuring CMake automatically. See [Installation](docs/installation.html#toolchain) for details.
