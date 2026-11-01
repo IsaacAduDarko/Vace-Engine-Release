@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABI and types — VACE Docs</title>
+  <meta name="description" content="Reference for the VACE script ABI: version, versioning rules, thread safety, and the types and enums used by the Script API." />
+  <link rel="stylesheet" href="assets/docs.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="doc-header">
+    <div class="doc-header__inner">
+      <button class="doc-header__toggle" id="docToggle" aria-label="Toggle navigation">☰</button>
+
+      <a href="index.html" class="doc-header__brand">
+        <img src="assets/img/vace-logo.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;margin-right:8px;" />
+        VACE <span class="doc-header__brand-badge">Docs</span>
+      </a>
+
+      <span class="doc-header__sep"></span>
+      <span class="doc-header__title">v0.1.0 · ABI v7</span>
+
+      <div class="doc-header__search">
+        <input type="search" placeholder="Search docs…  (press /)" aria-label="Search documentation" />
+      </div>
+
+      <div class="doc-header__actions">
+        <a href="https://github.com/IsaacAduDarko" class="doc-header__link">GitHub</a>
+        <a href="https://discord.gg/vjYZsQzuMq" class="doc-header__link">Discord</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-backdrop" id="docBackdrop"></div>
+
+  <!-- ============ LAYOUT ============ -->
+  <div class="doc-layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="doc-sidebar" id="docSidebar">
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Getting Started</span>
+        <a class="doc-sidebar__link" href="index.html">Overview</a>
+        <a class="doc-sidebar__link" href="getting-started.html">Getting started</a>
+        <a class="doc-sidebar__link" href="installation.html">Installation</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">The Editor</span>
+        <a class="doc-sidebar__link" href="editor.html">Editor walkthrough</a>
+        <a class="doc-sidebar__link" href="editor.html#project-manager">Project Manager</a>
+        <a class="doc-sidebar__link" href="editor.html#settings">Settings</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Scripting</span>
+        <a class="doc-sidebar__link" href="scripting.html">Script API reference</a>
+        <a class="doc-sidebar__link" href="scripting.html#intro">Introduction</a>
+        <a class="doc-sidebar__link" href="scripting.html#fields">Inspector fields</a>
+        <a class="doc-sidebar__link" href="scripting.html#input">Input</a>
+        <a class="doc-sidebar__link" href="scripting.html#transform">Transform</a>
+        <a class="doc-sidebar__link" href="scripting.html#physics">Physics</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Reference</span>
+        <a class="doc-sidebar__link is-active" href="abi.html">ABI &amp; types</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">About</span>
+        <a class="doc-sidebar__link" href="about.html">Vanta Games</a>
+        <a class="doc-sidebar__link" href="about.html#contact">Contact</a>
+        <a class="doc-sidebar__link" href="about.html#changelog">Changelog</a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="doc-content" id="docContent">
+
+      <nav class="doc-breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <a href="scripting.html">Scripting</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <span>ABI and types</span>
+      </nav>
+
+      <h1>ABI and types</h1>
+
+      <p class="doc-lede">
+        Reference material for the VACE script ABI and the data types the Script API
+        exposes. Most users never need this page directly. It matters when you write
+        your own tooling, debug a script that fails to load, or want to understand why
+        a new engine feature does not break existing scripts.
+      </p>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">You are probably looking for the scripting reference</span>
+          <p>
+            If you are writing gameplay scripts, the API itself is documented in the
+            <a href="scripting.html">Script API reference</a>. This page covers the
+            underlying contract, not the calls you make day to day.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="abi-version">ABI version</h2>
+
+      <p>
+        The current ABI is <strong>v7</strong>. A compiled script reports its ABI
+        version by returning <code>7u</code> from the exported
+        <code>vace_script_abi()</code> function. The engine checks this value when it
+        loads a script DLL and refuses to load a script built against an incompatible
+        ABI.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">std::uint32_t</span> <span class="name">vace_script_abi</span><span class="args">()</span>
+      </div>
+
+      <p>
+        If you see a "script ABI mismatch" error in the editor console, the script DLL
+        was built against an older ABI version. Rebuild the project; the current build
+        pipeline always emits the current ABI number.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="versioning">Versioning rules</h2>
+
+      <p>
+        <code>VACE_ScriptContext</code> is the function-pointer table the runtime
+        installs into a script before <code>OnCreate</code> fires. Every method in
+        the <a href="scripting.html">Script API</a> is a thin wrapper over one entry
+        in that table.
+      </p>
+
+      <p>
+        The table is <strong>append-only</strong>. Two consequences:
+      </p>
+
+      <ul>
+        <li>
+          <strong>New features do not bump the version.</strong> When a new engine
+          feature adds a function pointer, it goes at the end of the table. An old
+          script reads the table's <code>size</code> field, sees a shorter struct than
+          the engine provides, and simply stops reading. A new script reads the tail.
+          Audio, UI, animation, physics, IK, particles, and gamepads were all added
+          without bumping the ABI.
+        </li>
+        <li>
+          <strong>Breaking changes bump the version.</strong> Removing a function,
+          changing a signature, or changing the meaning of an existing entry requires a
+          new ABI number. Scripts built against the old ABI then fail the check at load
+          time instead of misbehaving silently.
+        </li>
+      </ul>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">In practice</span>
+          <p>
+            A script you build today against ABI v7 will keep working across every
+            engine update that does not bump the ABI. When the ABI does bump, you get a
+            clear load-time error and a rebuild fixes it.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="field-injection">Field injection</h2>
+
+      <p>
+        When the engine loads a script instance, the sequence is:
+      </p>
+
+      <ol>
+        <li>Construct the script instance</li>
+        <li>Install the ABI context</li>
+        <li>Apply saved inspector field values</li>
+        <li>Call <code>vace_script_create_hook</code>, which invokes <code>OnCreate</code></li>
+      </ol>
+
+      <p>
+        The order means <code>OnCreate</code> always sees the saved inspector values
+        (when inspector field persistence is finished; see the note on
+        <a href="scripting.html#fields">inspector fields</a> for the current
+        limitation).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="thread-safety">Thread safety</h2>
+
+      <p>
+        All ABI calls are safe to make from <code>OnCreate</code>, <code>OnUpdate</code>,
+        and <code>OnDestroy</code>. They are also safe to make from any function those
+        hooks call directly.
+      </p>
+
+      <p>
+        Do not spawn your own threads and call into the ABI context from them. The
+        engine serializes script execution on a single thread, and calling into the
+        context from a different thread is undefined behavior.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="types">Types and enums</h2>
+
+      <p>
+        The Script API uses a small set of POD structs and enums for values that cross
+        the script boundary. Their field layouts are stable within an ABI version.
+      </p>
+
+      <h3 id="script-raycast-hit">ScriptRaycastHit</h3>
+
+      <p>Returned by <code>Raycast</code> and <code>Raycast2D</code>.</p>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>node</code></td><td><code>uint32_t</code></td><td>ID of the hit node, or <code>0</code> if the raycast missed</td></tr>
+          <tr><td><code>point</code></td><td><code>Vec3</code></td><td>World-space hit point</td></tr>
+          <tr><td><code>normal</code></td><td><code>Vec3</code></td><td>Surface normal at the hit</td></tr>
+          <tr><td><code>distance</code></td><td><code>float</code></td><td>Distance from the ray origin to the hit</td></tr>
+          <tr><td><code>isTrigger</code></td><td><code>bool</code></td><td>Whether the hit collider is a trigger</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="script-collision">ScriptCollision</h3>
+
+      <p>
+        Returned by <code>GetCollisions</code>, <code>GetCollisionsEntered</code>, and
+        <code>GetCollisionsExited</code>.
+      </p>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>other</code></td><td><code>uint32_t</code></td><td>The other node in the contact</td></tr>
+          <tr><td><code>isTrigger</code></td><td><code>bool</code></td><td>Whether the contact involved a trigger</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="script-field-desc">ScriptFieldDesc and ScriptFieldType</h3>
+
+      <p>
+        Used by <code>GetFields()</code> to describe inspector-visible members. The
+        engine uses this reflection data to build the inspector UI for a script.
+      </p>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>ScriptFieldType</th><th>Maps to C++ type</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Float</code></td><td><code>float</code>, <code>double</code></td></tr>
+          <tr><td><code>Int</code></td><td><code>int</code></td></tr>
+          <tr><td><code>Bool</code></td><td><code>bool</code></td></tr>
+          <tr><td><code>Vec2</code></td><td><code>glm::vec2</code></td></tr>
+          <tr><td><code>Vec3</code></td><td><code>glm::vec3</code>, <code>Vec3</code></td></tr>
+          <tr><td><code>String</code></td><td><code>std::string</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="field-value-type">VACE_ScriptFieldValueType</h3>
+
+      <p>
+        Type tag used for values passed through the ABI when the engine applies saved
+        inspector values. It is an internal detail of the field injection process and
+        normally does not need to be referenced by script code.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="enums">Enums used by the Script API</h2>
+
+      <p>
+        These enums come from engine headers. You include them via
+        <code>VACE/Scripting/Script.hpp</code>, which pulls in the rest.
+      </p>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Enum</th><th>Header</th><th>Used by</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>VACE::Key</code></td><td><code>VACE/Input/Key.hpp</code></td><td>Keyboard methods (<code>IsKeyDown</code>, <code>WasKeyPressed</code>, <code>WasKeyReleased</code>)</td></tr>
+          <tr><td><code>VACE::MouseButton</code></td><td><code>VACE/Input/Mouse.hpp</code></td><td>Mouse methods (<code>IsMouseDown</code>, and so on)</td></tr>
+          <tr><td><code>VACE::GamepadButton</code></td><td><code>VACE/Input/Gamepad.hpp</code></td><td>Gamepad button methods</td></tr>
+          <tr><td><code>VACE::GamepadAxis</code></td><td><code>VACE/Input/Gamepad.hpp</code></td><td><code>GetGamepadAxis</code></td></tr>
+          <tr><td><code>VACE::AudioGroup</code></td><td><code>VACE/Audio/Audio.hpp</code></td><td><code>SetGroupVolume</code>, <code>GetGroupVolume</code></td></tr>
+        </tbody>
+      </table>
+
+      <!-- ============================================================ -->
+      <h2 id="rebuilding">When to rebuild</h2>
+
+      <p>
+        Rebuild your project (or press Play, which rebuilds automatically) after
+        changing any of the following:
+      </p>
+
+      <ul>
+        <li>Any <code>.cpp</code> file in the project's scripts folder</li>
+        <li>The engine installation itself, if you update VACE</li>
+        <li>The compiler path or version in the Project Manager's Settings tab</li>
+      </ul>
+
+      <p>
+        If the editor reports a script ABI mismatch, rebuilding fixes it. If the
+        editor reports a link error, the compiler path is probably wrong; see
+        <a href="editor.html#settings">Project Manager &gt; Settings</a>.
+      </p>
+
+      <!-- ============ PAGINATION ============ -->
+      <nav class="doc-pagination">
+        <a href="scripting.html" class="doc-pagination__prev">
+          <span class="doc-pagination__label">Previous</span>
+          <span class="doc-pagination__title">Script API reference</span>
+        </a>
+        <a href="about.html" class="doc-pagination__next">
+          <span class="doc-pagination__label">Next</span>
+          <span class="doc-pagination__title">About Vanta Games</span>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- ============ TOC ============ -->
+    <aside class="doc-toc" id="docToc">
+      <div class="doc-toc__label">On this page</div>
+      <nav class="doc-toc__list" id="docTocList"></nav>
+    </aside>
+
+  </div>
+
+  <button class="doc-top" id="docTop" title="Back to top">↑</button>
+
+  <script src="assets/docs.js"></script>
+</body>
+</html>

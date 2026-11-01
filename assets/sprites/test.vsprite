@@ -1,0 +1,26 @@
+{
+    "format": "vsprite",
+    "version": 1,
+    "texture": "assets/sprites/player.png",
+    "slice": {
+        "mode": "grid",
+        "tileWidth": 32,
+        "tileHeight": 32,
+        "marginX": 0,
+        "marginY": 0,
+        "spacingX": 0,
+        "spacingY": 0
+    },
+    "regions": [
+        { "name": "idle_0", "uv": [0.0, 0.0, 0.25, 0.5] }
+    ],
+    "clips": [
+        {
+            "name": "Idle",
+            "looping": true,
+            "frames": [
+                { "region": "idle_0", "duration": 0.15 }
+            ]
+        }
+    ]
+}

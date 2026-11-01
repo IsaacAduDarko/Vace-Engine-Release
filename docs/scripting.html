@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Script API reference — VACE Docs</title>
+  <meta name="description" content="C++ scripting reference for VACE: lifecycle hooks, inspector fields, input, transform, scene, audio, UI, animation, particles, physics, IK, and JSON save data." />
+  <link rel="stylesheet" href="assets/docs.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="doc-header">
+    <div class="doc-header__inner">
+      <button class="doc-header__toggle" id="docToggle" aria-label="Toggle navigation">☰</button>
+
+      <a href="index.html" class="doc-header__brand">
+        <img src="assets/img/vace-logo.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;margin-right:8px;" />
+        VACE <span class="doc-header__brand-badge">Docs</span>
+      </a>
+
+      <span class="doc-header__sep"></span>
+      <span class="doc-header__title">v0.1.0 · ABI v7</span>
+
+      <div class="doc-header__search">
+        <input type="search" placeholder="Search docs…  (press /)" aria-label="Search documentation" />
+      </div>
+
+      <div class="doc-header__actions">
+        <a href="https://github.com/IsaacAduDarko" class="doc-header__link">GitHub</a>
+        <a href="https://discord.gg/vjYZsQzuMq" class="doc-header__link">Discord</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-backdrop" id="docBackdrop"></div>
+
+  <!-- ============ LAYOUT ============ -->
+  <div class="doc-layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="doc-sidebar" id="docSidebar">
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Getting Started</span>
+        <a class="doc-sidebar__link" href="index.html">Overview</a>
+        <a class="doc-sidebar__link" href="getting-started.html">Getting started</a>
+        <a class="doc-sidebar__link" href="installation.html">Installation</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">The Editor</span>
+        <a class="doc-sidebar__link" href="editor.html">Editor walkthrough</a>
+        <a class="doc-sidebar__link" href="editor.html#project-manager">Project Manager</a>
+        <a class="doc-sidebar__link" href="editor.html#settings">Settings</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Scripting</span>
+        <a class="doc-sidebar__link is-active" href="scripting.html">Script API reference</a>
+        <a class="doc-sidebar__link" href="scripting.html#intro">Introduction</a>
+        <a class="doc-sidebar__link" href="scripting.html#fields">Inspector fields</a>
+        <a class="doc-sidebar__link" href="scripting.html#input">Input</a>
+        <a class="doc-sidebar__link" href="scripting.html#transform">Transform</a>
+        <a class="doc-sidebar__link" href="scripting.html#physics">Physics</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Reference</span>
+        <a class="doc-sidebar__link" href="abi.html">ABI &amp; types</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">About</span>
+        <a class="doc-sidebar__link" href="about.html">Vanta Games</a>
+        <a class="doc-sidebar__link" href="about.html#contact">Contact</a>
+        <a class="doc-sidebar__link" href="about.html#changelog">Changelog</a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="doc-content" id="docContent">
+
+      <nav class="doc-breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <a href="scripting.html">Scripting</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <span>Script API reference</span>
+      </nav>
+
+      <h1>Script API reference</h1>
+
+      <p class="doc-lede">
+        The C++ scripting interface for VACE. Scripts subclass <code>VACE::Script</code>,
+        compile into a <code>.dll</code>, and attach to scene nodes. Everything the
+        engine exposes to a script is documented here. Types, enums, and the low-level
+        ABI are on the <a href="abi.html">ABI and types</a> page.
+      </p>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Press / to search this page</span>
+          <p>
+            The search box at the top of the page filters the methods and sections on
+            this page as you type. Use it to jump to a method by name, or to filter to
+            a single API area (for example type <code>raycast</code> or <code>audio</code>).
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="intro">Introduction</h2>
+
+      <p>
+        The <code>VACE::Script</code> base class is the C++ interface used to write
+        gameplay scripts that run inside the VACE runtime. A script is compiled into a
+        <code>.dll</code>, registered with <code>VACE_REGISTER_SCRIPT</code>, and
+        attached to a scene node (or to the scene itself).
+      </p>
+
+      <p>
+        All engine calls go through a versioned function-pointer table,
+        <code>VACE_ScriptContext</code>, which the runtime installs before
+        <code>OnCreate</code> fires. Everything documented on this page is a thin
+        inline wrapper over that table.
+      </p>
+
+      <h3>Minimal script</h3>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">Spinner.cpp</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>#include "VACE/Scripting/Script.hpp"
+
+class Spinner : public VACE::Script
+{
+public:
+    void OnUpdate(float dt) override
+    {
+        SetRotation2D(GetRotation2D() + glm::radians(90.0f) * dt);
+    }
+};
+
+VACE_REGISTER_SCRIPT(Spinner)</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="quickstart">Quick start</h2>
+
+      <ol>
+        <li>In the editor, select a node and use the inspector to create a new script, or attach an existing one.</li>
+        <li>Subclass <code>VACE::Script</code> in the generated <code>.cpp</code> file.</li>
+        <li>Override <code>OnCreate</code>, <code>OnUpdate</code>, or <code>OnDestroy</code> as needed.</li>
+        <li>End the file with <code>VACE_REGISTER_SCRIPT(ClassName)</code>. This emits the exported ABI entry points.</li>
+        <li>Press Play. VACE builds any out-of-date script DLLs before the scene runs.</li>
+      </ol>
+
+      <!-- ============================================================ -->
+      <h2 id="registration">Registration and lifecycle</h2>
+
+      <p>
+        <code>VACE_REGISTER_SCRIPT(ClassName)</code> exports the C entry points the
+        runtime uses to create, drive, and destroy instances:
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">void*</span> <span class="name">vace_script_create</span><span class="args">(const VACE_ScriptContext* ctx)</span>
+<span class="ret">void</span>  <span class="name">vace_script_destroy</span><span class="args">(void* p)</span>
+<span class="ret">void</span>  <span class="name">vace_script_create_hook</span><span class="args">(void* p)</span>
+<span class="ret">void</span>  <span class="name">vace_script_destroy_hook</span><span class="args">(void* p)</span>
+<span class="ret">void</span>  <span class="name">vace_script_update</span><span class="args">(void* p, float dt)</span>
+<span class="ret">std::uint32_t</span> <span class="name">vace_script_abi</span><span class="args">()</span>
+      </div>
+
+      <h3>Overridable lifecycle hooks</h3>
+
+      <div class="doc-method">
+        <h4>OnCreate<span class="doc-badge doc-badge--virtual">virtual</span></h4>
+        <div class="doc-sig"><span class="ret">void</span> <span class="name">OnCreate</span><span class="args">()</span></div>
+        <p>
+          Called once, right after the script instance is constructed and its ABI
+          context is installed. Inspector field values have already been applied. Use
+          this to cache node IDs and set up state.
+        </p>
+      </div>
+
+      <div class="doc-method">
+        <h4>OnUpdate<span class="doc-badge doc-badge--virtual">virtual</span></h4>
+        <div class="doc-sig"><span class="ret">void</span> <span class="name">OnUpdate</span><span class="args">(float dt)</span></div>
+        <p>
+          Called every frame while the script is active. <code>dt</code> is the
+          elapsed seconds since the previous frame, so it is frame-rate independent.
+        </p>
+      </div>
+
+      <div class="doc-method">
+        <h4>OnDestroy<span class="doc-badge doc-badge--virtual">virtual</span></h4>
+        <div class="doc-sig"><span class="ret">void</span> <span class="name">OnDestroy</span><span class="args">()</span></div>
+        <p>Called once before the instance is freed. Release any non-trivial state.</p>
+      </div>
+
+      <div class="doc-method">
+        <h4>GetFields<span class="doc-badge doc-badge--virtual">virtual</span></h4>
+        <div class="doc-sig"><span class="ret">const std::vector&lt;ScriptFieldDesc&gt;&amp;</span> <span class="name">GetFields</span><span class="args">() const</span></div>
+        <p>
+          Optional. Return the reflection descriptors the editor uses to display the
+          script's fields. The default returns an empty list.
+        </p>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="fields">Inspector fields</h2>
+
+      <p>
+        Prefix a public member with <code>VACE_FIELD()</code> to make it show up in the
+        editor's inspector. Supported types: <code>float</code>, <code>double</code>,
+        <code>int</code>, <code>bool</code>, <code>glm::vec2</code>,
+        <code>glm::vec3</code>, <code>Vec3</code>, <code>std::string</code>.
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">Player.cpp</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>class Player : public VACE::Script
+{
+public:
+    VACE_FIELD()
+    float moveSpeed = 5.0f;
+
+    VACE_FIELD()
+    int maxHealth = 100;
+
+    VACE_FIELD()
+    bool invulnerable = false;
+
+    VACE_FIELD()
+    glm::vec3 spawnOffset{ 0.0f, 1.0f, 0.0f };
+
+    VACE_FIELD()
+    std::string greeting = "Hello";
+
+private:
+    int m_health = 100;   // not exposed, private state
+};</code></pre>
+      </div>
+
+      <div class="doc-callout doc-callout--warn">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Inspector fields are still under development</span>
+          <p>
+            <code>VACE_FIELD()</code> members currently show up in the inspector and
+            can be edited there, but <strong>editing them does not yet change the value
+            the running script sees</strong>. Until this is finished, set default values
+            directly in the class body and treat the inspector field as documentation.
+            This is a known limitation and will change in a future release.
+          </p>
+        </div>
+      </div>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Rule of thumb</span>
+          <p>
+            Members after a <code>VACE_FIELD()</code> line are <code>public</code> until
+            the next access specifier. Start a fresh <code>private:</code> block after
+            the last editable field if you keep private state.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="logging">Logging</h2>
+
+      <p>
+        Five <code>printf</code>-style helpers, each mapping to a level in the editor
+        console:
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">void</span> <span class="name">LogTrace</span><span class="args">(const char* fmt, ...) const</span>
+<span class="ret">void</span> <span class="name">LogDebug</span><span class="args">(const char* fmt, ...) const</span>
+<span class="ret">void</span> <span class="name">LogInfo</span><span class="args">(const char* fmt, ...) const</span>
+<span class="ret">void</span> <span class="name">LogWarning</span><span class="args">(const char* fmt, ...) const</span>
+<span class="ret">void</span> <span class="name">LogError</span><span class="args">(const char* fmt, ...) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>void OnUpdate(float dt) override
+{
+    LogInfo("frame dt = %.4f", dt);
+
+    if (GetNodeId() == 0)
+    {
+        LogWarning("script not attached to a node");
+    }
+}</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="input">Input</h2>
+
+      <h3 id="keyboard">Keyboard</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">IsKeyDown</span><span class="args">(Key key) const</span>
+<span class="ret">bool</span> <span class="name">WasKeyPressed</span><span class="args">(Key key) const</span>
+<span class="ret">bool</span> <span class="name">WasKeyReleased</span><span class="args">(Key key) const</span>
+      </div>
+
+      <p>These read against the key enum in <code>VACE/Input/Key.hpp</code>.</p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>if (IsKeyDown(VACE::Key::Space))
+{
+    // jump while held
+}
+
+if (WasKeyPressed(VACE::Key::Escape))
+{
+    LoadScene("Scenes/MainMenu.vscene");
+}</code></pre>
+      </div>
+
+      <h3 id="mouse">Mouse</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span>      <span class="name">IsMouseDown</span><span class="args">(MouseButton button) const</span>
+<span class="ret">bool</span>      <span class="name">WasMousePressed</span><span class="args">(MouseButton button) const</span>
+<span class="ret">bool</span>      <span class="name">WasMouseReleased</span><span class="args">(MouseButton button) const</span>
+<span class="ret">glm::vec2</span> <span class="name">GetMousePosition</span><span class="args">() const</span>
+<span class="ret">glm::vec2</span> <span class="name">GetMouseDelta</span><span class="args">() const</span>
+<span class="ret">glm::vec2</span> <span class="name">GetMouseWheel</span><span class="args">() const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>glm::vec2 mp = GetMousePosition();
+glm::vec2 md = GetMouseDelta();
+glm::vec2 mw = GetMouseWheel();   // x = horizontal, y = vertical
+
+if (WasMousePressed(VACE::MouseButton::Left))
+{
+    LogInfo("clicked at %.1f, %.1f", mp.x, mp.y);
+}</code></pre>
+      </div>
+
+      <h3 id="actions">Input actions</h3>
+
+      <p>
+        Actions are named bindings configured in the project settings. They map to any
+        combination of keys, mouse buttons, or gamepad inputs.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">bool</span>  <span class="name">IsActionHeld</span><span class="args">(const char* action) const</span>
+<span class="ret">bool</span>  <span class="name">WasActionPressed</span><span class="args">(const char* action) const</span>
+<span class="ret">bool</span>  <span class="name">WasActionReleased</span><span class="args">(const char* action) const</span>
+<span class="ret">float</span> <span class="name">GetActionStrength</span><span class="args">(const char* action) const</span>
+      </div>
+
+      <h4>Axis composition</h4>
+
+      <div class="doc-sig">
+<span class="ret">float</span> <span class="name">GetAxis</span><span class="args">(const char* negative, const char* positive) const</span>
+<span class="ret">Vec3</span>  <span class="name">GetVector</span><span class="args">(const char* negativeX, const char* positiveX,
+                        const char* negativeY, const char* positiveY) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>// single axis (for example, horizontal steering)
+float turn = GetAxis("turn_left", "turn_right");
+
+// 2D vector (left stick style)
+Vec3 move = GetVector("move_left",   "move_right",
+                      "move_forward","move_back");
+
+SetPosition(GetPosition() + move * 3.0f * dt);</code></pre>
+      </div>
+
+      <h3 id="gamepads">Gamepads</h3>
+
+      <div class="doc-sig">
+<span class="ret">int</span>         <span class="name">GetGamepadCount</span><span class="args">() const</span>
+<span class="ret">bool</span>        <span class="name">IsGamepadConnected</span><span class="args">(int index = 0) const</span>
+<span class="ret">std::string</span> <span class="name">GetGamepadName</span><span class="args">(int index = 0) const</span>
+<span class="ret">bool</span>        <span class="name">IsGamepadButtonDown</span><span class="args">(GamepadButton button, int index = 0) const</span>
+<span class="ret">bool</span>        <span class="name">WasGamepadButtonPressed</span><span class="args">(GamepadButton button, int index = 0) const</span>
+<span class="ret">bool</span>        <span class="name">WasGamepadButtonReleased</span><span class="args">(GamepadButton button, int index = 0) const</span>
+<span class="ret">float</span>       <span class="name">GetGamepadAxis</span><span class="args">(GamepadAxis axis, int index = 0) const</span>
+<span class="ret">Vec3</span>        <span class="name">GetGamepadStick</span><span class="args">(bool rightStick = false, int index = 0) const</span>
+<span class="ret">bool</span>        <span class="name">SetGamepadRumble</span><span class="args">(float lowFrequency, float highFrequency,
+                     float seconds, int index = 0) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>if (IsGamepadConnected(0))
+{
+    Vec3 stick = GetGamepadStick(false /* left */);
+    SetPosition(GetPosition() + stick * 4.0f * dt);
+
+    if (WasGamepadButtonPressed(VACE::GamepadButton::A))
+    {
+        SetGamepadRumble(0.6f, 0.3f, 0.15f, 0);
+    }
+}</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="transform">Transform</h2>
+
+      <h3 id="transform-self">Self transform</h3>
+
+      <p>
+        Convenience wrappers that read and write the transform of the node the script
+        is attached to.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">Vec3</span> <span class="name">GetPosition</span><span class="args">() const</span>   <span class="name">SetPosition</span><span class="args">(const Vec3&amp;) const</span>
+<span class="ret">Quat</span> <span class="name">GetRotation</span><span class="args">() const</span>   <span class="name">SetRotation</span><span class="args">(const Quat&amp;) const</span>
+<span class="ret">Vec3</span> <span class="name">GetScale</span><span class="args">() const</span>      <span class="name">SetScale</span><span class="args">(const Vec3&amp;) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>// frame-rate independent horizontal motion
+SetPosition(GetPosition() + Vec3(1.5f * dt, 0.0f, 0.0f));</code></pre>
+      </div>
+
+      <div class="doc-callout doc-callout--warn">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Scene scripts</span>
+          <p>
+            When <code>nodeId == 0</code> (a scene-level script, not attached to a
+            node), all self-transform getters return defaults and all setters are
+            no-ops. Guard with <code>IsAttachedToNode()</code> or use the targeted
+            versions below.
+          </p>
+        </div>
+      </div>
+
+      <h3 id="transform-node">Targeted transform</h3>
+
+      <p>Read and write the transform of any node, addressed by its node id.</p>
+
+      <div class="doc-sig">
+<span class="ret">Vec3</span> <span class="name">GetNodePosition</span><span class="args">(std::uint32_t nodeId) const</span>   <span class="name">SetNodePosition</span><span class="args">(std::uint32_t nodeId, const Vec3&amp;) const</span>
+<span class="ret">Quat</span> <span class="name">GetNodeRotation</span><span class="args">(std::uint32_t nodeId) const</span>   <span class="name">SetNodeRotation</span><span class="args">(std::uint32_t nodeId, const Quat&amp;) const</span>
+<span class="ret">Vec3</span> <span class="name">GetNodeScale</span><span class="args">(std::uint32_t nodeId) const</span>      <span class="name">SetNodeScale</span><span class="args">(std::uint32_t nodeId, const Vec3&amp;) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>std::uint32_t target = FindNodeByName("Enemy");
+if (target != 0)
+{
+    SetNodePosition(target, Vec3(0.0f, 0.0f, -5.0f));
+}</code></pre>
+      </div>
+
+      <h3 id="transform-2d">2D transform</h3>
+
+      <p>
+        For sprites and 2D scenes, use the 2D-aware accessors. Rotation is in radians
+        (positive is counter-clockwise). Scale is a per-axis <code>glm::vec2</code>.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">float</span>     <span class="name">GetRotation2D</span><span class="args">() const</span>   <span class="name">SetRotation2D</span><span class="args">(float radians) const</span>
+<span class="ret">glm::vec2</span> <span class="name">GetScale2D</span><span class="args">() const</span>      <span class="name">SetScale2D</span><span class="args">(const glm::vec2&amp;) const</span>
+<span class="ret">float</span>     <span class="name">GetNodeRotation2D</span><span class="args">(std::uint32_t) const</span>  <span class="name">SetNodeRotation2D</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">glm::vec2</span> <span class="name">GetNodeScale2D</span><span class="args">(std::uint32_t) const</span>     <span class="name">SetNodeScale2D</span><span class="args">(std::uint32_t, const glm::vec2&amp;) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>// rotate at 90 degrees per second
+SetRotation2D(GetRotation2D() + glm::radians(90.0f) * dt);
+
+// flip a sprite
+SetScale2D(glm::vec2(-1.0f, 1.0f));</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="scene">Scene</h2>
+
+      <h3 id="scene-queries">Scene queries and node lifetime</h3>
+
+      <div class="doc-sig">
+<span class="ret">std::uint32_t</span> <span class="name">FindNodeByName</span><span class="args">(const char* name) const</span>
+<span class="ret">std::uint32_t</span> <span class="name">GetNodeCount</span><span class="args">() const</span>
+<span class="ret">std::uint32_t</span> <span class="name">GetNodeIdAt</span><span class="args">(std::uint32_t index) const</span>
+<span class="ret">std::string</span>   <span class="name">GetNodeName</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span>          <span class="name">IsNodeEnabled</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">void</span>          <span class="name">SetNodeEnabled</span><span class="args">(std::uint32_t nodeId, bool enabled) const</span>
+      </div>
+
+      <h4>Identity</h4>
+
+      <div class="doc-sig">
+<span class="ret">std::uint32_t</span> <span class="name">GetNodeId</span><span class="args">() const</span>
+<span class="ret">bool</span>          <span class="name">IsAttachedToNode</span><span class="args">() const</span>
+      </div>
+
+      <h4>Cloning and destruction</h4>
+
+      <div class="doc-sig">
+<span class="ret">std::uint32_t</span> <span class="name">CloneNode</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">std::uint32_t</span> <span class="name">CloneSelf</span><span class="args">() const</span>
+<span class="ret">std::uint32_t</span> <span class="name">Instantiate</span><span class="args">(std::uint32_t nodeId, const Vec3&amp; position) const</span>
+<span class="ret">bool</span>          <span class="name">DestroyNode</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span>          <span class="name">DestroySelf</span><span class="args">() const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>// spawn 10 zombies along the x-axis
+std::uint32_t templateNode = FindNodeByName("ZombieTemplate");
+
+for (int i = 0; i &lt; 10; ++i)
+{
+    Instantiate(templateNode, Vec3((float)i * 2.0f, 0.0f, 0.0f));
+}</code></pre>
+      </div>
+
+      <h3 id="camera">Camera override</h3>
+
+      <p>
+        Request a different active camera, or query the current one. Cleared by
+        passing <code>0</code> via <code>ClearActiveCamera</code>.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">bool</span>          <span class="name">SetActiveCamera</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span>          <span class="name">SetActiveCameraByName</span><span class="args">(const char* name) const</span>
+<span class="ret">void</span>          <span class="name">ClearActiveCamera</span><span class="args">() const</span>
+<span class="ret">std::uint32_t</span> <span class="name">GetActiveCamera</span><span class="args">() const</span>
+      </div>
+
+      <h3 id="scene-loading">Scene loading</h3>
+
+      <p>
+        <code>LoadScene</code> is deferred: it queues a scene change for the end of the
+        frame so the currently-running script finishes cleanly. The path is relative to
+        the project root; the <code>.vscene</code> extension is optional.
+      </p>
+
+       <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">LoadScene</span><span class="args">(const char* scenePath) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>if (GetPosition().y &lt; -100.0f)
+{
+    LoadScene("Scenes/GameOver.vscene");
+}</code></pre>
+      </div>
+
+      <h3 id="time">Time</h3>
+
+      <div class="doc-sig">
+<span class="ret">float</span> <span class="name">GetTime</span><span class="args">() const</span>
+      </div>
+
+      <p>Seconds since the runtime started. Monotonic, unaffected by frame pacing.</p>
+
+      <!-- ============================================================ -->
+      <h2 id="audio">Audio</h2>
+
+      <p>
+        Per-node sounds are attached to any node in the scene, addressed by node id.
+        Group volumes control the whole mix (master, sfx, music, ui, and so on) via
+        <code>VACE::AudioGroup</code>.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">PlayNodeSound</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">StopNodeSound</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">IsNodeSoundPlaying</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeSoundVolume</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeSoundPitch</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeSoundSpatial</span><span class="args">(std::uint32_t, bool) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeSoundMinDistance</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeSoundMaxDistance</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeSoundRolloff</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeSoundCone</span><span class="args">(std::uint32_t, float innerDeg,
+                          float outerDeg, float outerGain) const</span>
+      </div>
+
+      <div class="doc-sig">
+<span class="ret">void</span>  <span class="name">SetGroupVolume</span><span class="args">(AudioGroup group, float) const</span>
+<span class="ret">float</span> <span class="name">GetGroupVolume</span><span class="args">(AudioGroup group) const</span>
+      </div>
+
+      <h3>Self sugar</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">PlaySound</span><span class="args">() const</span>       <span class="name">StopSound</span><span class="args">() const</span>
+<span class="ret">bool</span> <span class="name">IsSoundPlaying</span><span class="args">() const</span>
+<span class="ret">bool</span> <span class="name">SetSoundVolume</span><span class="args">(float) const</span> <span class="name">SetSoundPitch</span><span class="args">(float) const</span>
+<span class="ret">bool</span> <span class="name">SetSoundSpatial</span><span class="args">(bool) const</span>
+<span class="ret">bool</span> <span class="name">SetSoundMinDistance</span><span class="args">(float) const</span> <span class="name">SetSoundMaxDistance</span><span class="args">(float) const</span>
+<span class="ret">bool</span> <span class="name">SetSoundRolloff</span><span class="args">(float) const</span>
+<span class="ret">bool</span> <span class="name">SetSoundCone</span><span class="args">(float innerDeg, float outerDeg, float outerGain) const</span>
+<span class="ret">bool</span> <span class="name">PlaySoundByName</span><span class="args">(const char* nodeName) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>if (WasKeyPressed(VACE::Key::E))
+{
+    PlaySound();
+}
+
+SetGroupVolume(VACE::AudioGroup::Music, 0.4f);</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ui">UI</h2>
+
+      <p>Read and write UI widget state on any UI node.</p>
+
+      <h3>Data</h3>
+
+      <div class="doc-sig">
+<span class="ret">std::string</span> <span class="name">GetUIText</span><span class="args">(std::uint32_t nodeId) const</span>    <span class="ret">bool</span> <span class="name">SetUIText</span><span class="args">(std::uint32_t, const char*) const</span>
+<span class="ret">float</span>       <span class="name">GetUIValue</span><span class="args">(std::uint32_t nodeId) const</span>   <span class="ret">bool</span> <span class="name">SetUIValue</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">bool</span>        <span class="name">GetUIChecked</span><span class="args">(std::uint32_t nodeId) const</span> <span class="ret">bool</span> <span class="name">SetUIChecked</span><span class="args">(std::uint32_t, bool) const</span>
+<span class="ret">glm::vec4</span>   <span class="name">GetUIColor</span><span class="args">(std::uint32_t nodeId) const</span>  <span class="ret">bool</span> <span class="name">SetUIColor</span><span class="args">(std::uint32_t, float r, float g, float b, float a) const</span>
+<span class="ret">bool</span>        <span class="name">SetUIImage</span><span class="args">(std::uint32_t, const char* path) const</span>
+      </div>
+
+      <h3>Interaction</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">IsUIHovered</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">IsUIPressed</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">WasUIPressed</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">WasUIReleased</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">WasUIClicked</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">WasUIValueChanged</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">IsUIDragging</span><span class="args">(std::uint32_t nodeId) const</span>
+      </div>
+
+      <h3>Visibility</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">IsUIEnabled</span><span class="args">(std::uint32_t nodeId) const</span>    <span class="ret">bool</span> <span class="name">SetUIEnabled</span><span class="args">(std::uint32_t, bool) const</span>
+<span class="ret">bool</span> <span class="name">IsUIVisible</span><span class="args">(std::uint32_t nodeId) const</span>    <span class="ret">bool</span> <span class="name">SetUIVisible</span><span class="args">(std::uint32_t, bool) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>std::uint32_t scoreLabel = FindNodeByName("ScoreLabel");
+
+if (WasUIClicked(FindNodeByName("StartButton")))
+{
+    SetUIText(scoreLabel, "Loading...");
+}</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="animation">Animation</h2>
+
+      <p>
+        Two flavours are supported: <code>.vsprite</code> clips (2D sprite animation)
+        and skeletal <code>.glb</code> clips. Both target node ids. The self sugar
+        methods (<code>PlayAnimation</code>, <code>StopAnimation</code>,
+        <code>IsAnimationPlaying</code>, and so on) target the script's own node.
+      </p>
+
+      <h3>Playback</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">PlayNodeAnimation</span><span class="args">(std::uint32_t, const char* clipName) const</span>
+<span class="ret">bool</span> <span class="name">StopNodeAnimation</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">bool</span> <span class="name">PauseNodeAnimation</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">bool</span> <span class="name">ResumeNodeAnimation</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">bool</span> <span class="name">IsNodeAnimationPlaying</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">bool</span> <span class="name">IsNodeAnimationPaused</span><span class="args">(std::uint32_t) const</span>
+      </div>
+
+      <h3>Speed and time</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span>  <span class="name">SetNodeAnimationSpeed</span><span class="args">(std::uint32_t, float) const</span>
+<span class="ret">float</span> <span class="name">GetNodeAnimationSpeed</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">float</span> <span class="name">GetNodeAnimationTime</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">bool</span>  <span class="name">SetNodeAnimationTime</span><span class="args">(std::uint32_t, float) const</span>
+      </div>
+
+      <h3>Looping and clip info</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span>          <span class="name">IsNodeAnimationLooping</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">bool</span>          <span class="name">SetNodeAnimationLooping</span><span class="args">(std::uint32_t, bool) const</span>
+<span class="ret">std::string</span>   <span class="name">GetNodeAnimationClip</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">std::uint32_t</span> <span class="name">GetNodeAnimationClipCount</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">std::string</span>   <span class="name">GetNodeAnimationClipName</span><span class="args">(std::uint32_t, std::uint32_t index) const</span>
+<span class="ret">float</span>         <span class="name">GetNodeAnimationDuration</span><span class="args">(std::uint32_t) const</span>
+      </div>
+
+      <h3>Bindings</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">SetNodeAnimationVSprite</span><span class="args">(std::uint32_t, const char* path,
+                               const char* clipName) const</span>
+<span class="ret">bool</span> <span class="name">SetNodeAnimationSkeletal</span><span class="args">(std::uint32_t, const char* glbPath,
+                                const char* clipName) const</span>
+      </div>
+
+      <h3>Play range and crossfade</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span>  <span class="name">SetNodeAnimationPlayRange</span><span class="args">(std::uint32_t, float start, float end) const</span>
+<span class="ret">float</span> <span class="name">GetNodeAnimationRangeStart</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">float</span> <span class="name">GetNodeAnimationRangeEnd</span><span class="args">(std::uint32_t) const</span>
+<span class="ret">bool</span>  <span class="name">CrossFadeNodeAnimation</span><span class="args">(std::uint32_t, const char* clipName,
+                             float duration) const</span>
+      </div>
+
+      <p>
+        Self sugar methods mirror every targeted method above with the same name minus
+        <code>Node</code> (<code>PlayAnimation</code>, <code>StopAnimation</code>,
+        <code>IsAnimationPlaying</code>, <code>SetAnimationSpeed</code>, and so on).
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>void OnCreate() override
+{
+    SetAnimationSkeletal("Models/player.glb", "Idle");
+}
+
+void OnUpdate(float) override
+{
+    if (WasKeyPressed(VACE::Key::W))
+    {
+        CrossFadeAnimation("Run", 0.2f);
+    }
+}</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="particles">Particles</h2>
+
+      <div class="doc-sig">
+<span class="ret">bool</span>          <span class="name">PlayParticles</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span>          <span class="name">StopParticles</span><span class="args">(std::uint32_t nodeId, bool clearParticles = false) const</span>
+<span class="ret">bool</span>          <span class="name">PauseParticles</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span>          <span class="name">EmitParticles</span><span class="args">(std::uint32_t nodeId, std::uint32_t count) const</span>
+<span class="ret">bool</span>          <span class="name">IsParticlesPlaying</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">std::uint32_t</span> <span class="name">GetParticleCount</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span>          <span class="name">SetParticleRate</span><span class="args">(std::uint32_t, float perSecond) const</span>
+<span class="ret">bool</span>          <span class="name">SetParticleColor</span><span class="args">(std::uint32_t, float r, float g, float b, float a = 1.0f) const</span>
+<span class="ret">bool</span>          <span class="name">ApplyParticlePreset</span><span class="args">(std::uint32_t, const char* preset) const</span>
+      </div>
+
+      <p>
+        Self sugar: <code>PlayParticles()</code>, <code>StopParticles(bool)</code>,
+        <code>EmitParticles(count)</code>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="motionblur">Motion blur</h2>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">SetMotionBlur</span><span class="args">(std::uint32_t nodeId, bool enabled, float intensity = 1.0f) const</span>
+<span class="ret">bool</span> <span class="name">GetMotionBlur</span><span class="args">(std::uint32_t nodeId, bool&amp; outEnabled, float&amp; outIntensity) const</span>
+<span class="ret">bool</span> <span class="name">SetSceneMotionBlur</span><span class="args">(bool enabled, float shutter = 0.5f) const</span>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="physics">Physics</h2>
+
+      <h3 id="raycast">Raycast</h3>
+
+      <p>
+        Raycast against the scene's physics world. Bit N of a layer mask corresponds to
+        physics layer N (see <code>LayerMask()</code>). Pass <code>ignoreNode</code> to
+        skip the shooting node itself, typically <code>GetNodeId()</code>.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">Raycast</span><span class="args">(const Vec3&amp; origin, const Vec3&amp; direction, float maxDistance,
+            ScriptRaycastHit&amp; outHit,
+            std::uint32_t layerMask = 0xFFFFFFFF,
+            std::uint32_t ignoreNode = 0,
+            bool hitTriggers = false) const</span>
+
+<span class="ret">bool</span> <span class="name">Raycast2D</span><span class="args">(const Vec3&amp; origin, const Vec3&amp; direction, float maxDistance,
+              ScriptRaycastHit&amp; outHit,
+              std::uint32_t layerMask = 0xFFFFFFFF,
+              std::uint32_t ignoreNode = 0,
+              bool hitTriggers = false) const</span>
+
+<span class="ret">std::uint32_t</span> <span class="name">LayerMask</span><span class="args">(int layer)</span> <span class="doc-badge doc-badge--static">static</span>
+<span class="ret">int</span>           <span class="name">GetPhysicsLayer</span><span class="args">(const char* name) const</span>
+      </div>
+
+      <h4>Grounded checks</h4>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">IsGrounded</span><span class="args">(float distance = 0.1f, std::uint32_t layerMask = 0xFFFFFFFF) const</span>
+<span class="ret">bool</span> <span class="name">IsGrounded2D</span><span class="args">(float distance = 0.1f, std::uint32_t layerMask = 0xFFFFFFFF) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>ScriptRaycastHit hit;
+
+if (Raycast(GetPosition(), Vec3(0, -1, 0), 10.0f, hit,
+            LayerMask(GetPhysicsLayer("Ground")),
+            GetNodeId()))
+{
+    LogInfo("floor is at distance %.2f", hit.distance);
+}</code></pre>
+      </div>
+
+      <h3 id="velocity">Velocity and forces</h3>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">HasPhysicsBody</span><span class="args">(std::uint32_t nodeId) const</span>
+<span class="ret">bool</span> <span class="name">HasPhysicsBody</span><span class="args">() const</span> <span class="doc-badge doc-badge--self">self</span>
+
+<span class="ret">Vec3</span> <span class="name">GetLinearVelocity</span><span class="args">(std::uint32_t nodeId) const</span>  <span class="ret">bool</span> <span class="name">SetLinearVelocity</span><span class="args">(std::uint32_t, const Vec3&amp;) const</span>
+<span class="ret">Vec3</span> <span class="name">GetAngularVelocity</span><span class="args">(std::uint32_t nodeId) const</span> <span class="ret">bool</span> <span class="name">SetAngularVelocity</span><span class="args">(std::uint32_t, const Vec3&amp;) const</span>
+<span class="ret">bool</span> <span class="name">AddForce</span><span class="args">(std::uint32_t, const Vec3&amp;) const</span>
+<span class="ret">bool</span> <span class="name">AddImpulse</span><span class="args">(std::uint32_t, const Vec3&amp;) const</span>
+      </div>
+
+      <div class="doc-sig">
+<span class="ret">Vec3</span> <span class="name">GetVelocity</span><span class="args">() const</span>         <span class="ret">bool</span> <span class="name">SetVelocity</span><span class="args">(const Vec3&amp;) const</span>
+<span class="ret">Vec3</span> <span class="name">GetAngularVelocity</span><span class="args">() const</span> <span class="ret">bool</span> <span class="name">SetAngularVelocity</span><span class="args">(const Vec3&amp;) const</span>
+<span class="ret">bool</span> <span class="name">AddForce</span><span class="args">(const Vec3&amp;) const</span>  <span class="ret">bool</span> <span class="name">AddImpulse</span><span class="args">(const Vec3&amp;) const</span>
+      </div>
+
+      <h3 id="collisions">Collision events</h3>
+
+      <p>
+        Physics events are collected per frame. Query them once per update. Each event
+        identifies the two nodes in the contact, whether the contact started or ended,
+        and whether either side is a trigger.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">std::vector&lt;ScriptCollision&gt;</span> <span class="name">GetCollisions</span><span class="args">(std::uint32_t nodeId, bool entered) const</span>
+<span class="ret">std::vector&lt;ScriptCollision&gt;</span> <span class="name">GetCollisionsEntered</span><span class="args">() const</span>
+<span class="ret">std::vector&lt;ScriptCollision&gt;</span> <span class="name">GetCollisionsExited</span><span class="args">() const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>for (const auto&amp; c : GetCollisionsEntered())
+{
+    if (c.isTrigger)   // e.g. hit a pickup
+    {
+        LogInfo("picked up node %u", c.other);
+        DestroyNode(c.other);
+    }
+}</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ik">Inverse kinematics</h2>
+
+      <p>
+        Drive an IK chain by name. Chains are configured in the editor's skeleton panel;
+        the name identifies the chain within the node's skeleton.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">SetIKTarget</span><span class="args">(std::uint32_t nodeId, const char* chain, const Vec3&amp; target) const</span>
+<span class="ret">bool</span> <span class="name">ClearIKTarget</span><span class="args">(std::uint32_t nodeId, const char* chain) const</span>
+<span class="ret">bool</span> <span class="name">SetIKWeight</span><span class="args">(std::uint32_t nodeId, const char* chain, float weight) const</span>
+<span class="ret">bool</span> <span class="name">SetIKEnabled</span><span class="args">(std::uint32_t nodeId, const char* chain, bool enabled) const</span>
+      </div>
+
+      <p>Self sugar mirrors these without the <code>nodeId</code> argument.</p>
+
+      <!-- ============================================================ -->
+      <h2 id="io">Save data (JSON I/O)</h2>
+
+      <p>
+        Persistent key/value storage backed by JSON files. The host owns all parsing.
+        You pass a file path (relative to the project root) and a dotted key like
+        <code>player.health</code> or <code>inventory.items[0].qty</code>. Each write
+        reads the file, mutates one path, and writes it back atomically.
+      </p>
+
+      <div class="doc-sig">
+<span class="ret">bool</span> <span class="name">SaveFloat</span><span class="args">(const char* path, const char* key, float) const</span>
+<span class="ret">float</span> <span class="name">LoadFloat</span><span class="args">(const char* path, const char* key, float fallback = 0.0f) const</span>
+<span class="ret">bool</span> <span class="name">SaveInt</span><span class="args">(const char* path, const char* key, int) const</span>
+<span class="ret">int</span> <span class="name">LoadInt</span><span class="args">(const char* path, const char* key, int fallback = 0) const</span>
+<span class="ret">bool</span> <span class="name">SaveBool</span><span class="args">(const char* path, const char* key, bool) const</span>
+<span class="ret">bool</span> <span class="name">LoadBool</span><span class="args">(const char* path, const char* key, bool fallback = false) const</span>
+<span class="ret">bool</span> <span class="name">SaveString</span><span class="args">(const char* path, const char* key, const std::string&amp;) const</span>
+<span class="ret">std::string</span> <span class="name">LoadString</span><span class="args">(const char* path, const char* key, const std::string&amp; fallback = "") const</span>
+<span class="ret">bool</span> <span class="name">DeleteKey</span><span class="args">(const char* path, const char* key) const</span>
+<span class="ret">bool</span> <span class="name">KeyExists</span><span class="args">(const char* path, const char* key) const</span>
+      </div>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">example</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>void OnCreate() override
+{
+    float hp = LoadFloat("saves/player.json", "player.health", 100.0f);
+    LogInfo("loaded health = %.1f", hp);
+}
+
+void OnDestroy() override
+{
+    SaveFloat("saves/player.json", "player.health", 100.0f);
+    SaveString("saves/player.json", "player.name", "Hero");
+}</code></pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="more">Next</h2>
+
+      <p>
+        Types, enums, and the low-level ABI notes have their own page:
+        <a href="abi.html">ABI and types</a>.
+      </p>
+
+      <!-- ============ PAGINATION ============ -->
+      <nav class="doc-pagination">
+        <a href="editor.html" class="doc-pagination__prev">
+          <span class="doc-pagination__label">Previous</span>
+          <span class="doc-pagination__title">Editor walkthrough</span>
+        </a>
+        <a href="abi.html" class="doc-pagination__next">
+          <span class="doc-pagination__label">Next</span>
+          <span class="doc-pagination__title">ABI and types</span>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- ============ TOC ============ -->
+    <aside class="doc-toc" id="docToc">
+      <div class="doc-toc__label">On this page</div>
+      <nav class="doc-toc__list" id="docTocList"></nav>
+    </aside>
+
+  </div>
+
+  <button class="doc-top" id="docTop" title="Back to top">↑</button>
+
+  <script src="assets/docs.js"></script>
+</body>
+</html>

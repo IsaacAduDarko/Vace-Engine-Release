@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation — VACE Docs</title>
+  <meta name="description" content="Install VACE on Windows: GPU requirement, extraction, first launch, and optional MinGW-w64 setup for C++ scripting. CMake is bundled with the engine and configured automatically." />
+  <link rel="stylesheet" href="assets/docs.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="doc-header">
+    <div class="doc-header__inner">
+      <button class="doc-header__toggle" id="docToggle" aria-label="Toggle navigation">☰</button>
+
+      <a href="index.html" class="doc-header__brand">
+        <img src="assets/img/vace-logo.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;margin-right:8px;" />
+        VACE <span class="doc-header__brand-badge">Docs</span>
+      </a>
+
+      <span class="doc-header__sep"></span>
+      <span class="doc-header__title">v0.1.0 · Windows x64</span>
+
+      <div class="doc-header__search">
+        <input type="search" placeholder="Search docs…  (press /)" aria-label="Search documentation" />
+      </div>
+
+      <div class="doc-header__actions">
+        <a href="https://github.com/IsaacAduDarko" class="doc-header__link">GitHub</a>
+        <a href="https://discord.gg/vjYZsQzuMq" class="doc-header__link">Discord</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-backdrop" id="docBackdrop"></div>
+
+  <!-- ============ LAYOUT ============ -->
+  <div class="doc-layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="doc-sidebar" id="docSidebar">
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Getting Started</span>
+        <a class="doc-sidebar__link" href="index.html">Overview</a>
+        <a class="doc-sidebar__link" href="getting-started.html">Getting started</a>
+        <a class="doc-sidebar__link is-active" href="installation.html">Installation</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">The Editor</span>
+        <a class="doc-sidebar__link" href="editor.html">Editor walkthrough</a>
+        <a class="doc-sidebar__link" href="editor.html#project-manager">Project Manager</a>
+        <a class="doc-sidebar__link" href="editor.html#settings">Settings</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Scripting</span>
+        <a class="doc-sidebar__link" href="scripting.html">Script API reference</a>
+        <a class="doc-sidebar__link" href="scripting.html#intro">Introduction</a>
+        <a class="doc-sidebar__link" href="scripting.html#fields">Inspector fields</a>
+        <a class="doc-sidebar__link" href="scripting.html#input">Input</a>
+        <a class="doc-sidebar__link" href="scripting.html#transform">Transform</a>
+        <a class="doc-sidebar__link" href="scripting.html#physics">Physics</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Reference</span>
+        <a class="doc-sidebar__link" href="abi.html">ABI &amp; types</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">About</span>
+        <a class="doc-sidebar__link" href="about.html">Vanta Games</a>
+        <a class="doc-sidebar__link" href="about.html#contact">Contact</a>
+        <a class="doc-sidebar__link" href="about.html#changelog">Changelog</a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="doc-content" id="docContent">
+
+      <nav class="doc-breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <a href="installation.html">Installation</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <span>Windows</span>
+      </nav>
+
+      <h1>Installation</h1>
+
+      <p class="doc-lede">
+        Everything you need to run the VACE editor, and the optional MinGW-w64 setup
+        you need to write C++ scripts. Read <a href="getting-started.html">Getting started</a>
+        first if you haven't yet, since that page walks you from a fresh download to
+        a running scene.
+      </p>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">CMake is bundled, MinGW-w64 is optional</span>
+          <p>
+            The release zip includes CMake as an MSI. The Project Manager runs the
+            installer for you, verifies it was configured, and handles the rest. The
+            only thing you download separately is MinGW-w64, and only if you plan to
+            write C++ scripts. The Project Manager also handles adding MinGW-w64 to
+            your environment variables, so there is no PATH editing on your side.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="system-requirements">System requirements</h2>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Component</th><th>Requirement</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>OS</strong></td>
+            <td>Windows 10 or 11, 64-bit</td>
+            <td>The only supported platform in v0.1.0</td>
+          </tr>
+          <tr>
+            <td><strong>GPU</strong></td>
+            <td>OpenGL 4.3 support</td>
+            <td>Required by the renderer. Older GPUs (including many from before 2012) will not run the editor.</td>
+          </tr>
+          <tr>
+            <td><strong>RAM</strong></td>
+            <td>4 GB minimum, 8 GB recommended</td>
+            <td>The engine was originally developed on an 8 GB laptop</td>
+          </tr>
+          <tr>
+            <td><strong>Disk</strong></td>
+            <td>About 1 GB for the engine</td>
+            <td>Projects add more depending on assets</td>
+          </tr>
+          <tr>
+            <td><strong>Toolchain</strong></td>
+            <td>Optional: MinGW-w64</td>
+            <td>Only needed for C++ scripting. CMake is bundled with the engine.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="doc-callout doc-callout--warn">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">OpenGL 4.3 is a hard requirement</span>
+          <p>
+            The renderer targets OpenGL 4.3. If your GPU reports 4.2 or lower, the
+            editor will fail to initialize. This is most common on laptops from before
+            2012 and on integrated GPUs on older Intel CPUs. Update your graphics
+            driver first; if the version is still below 4.3, the engine will not run
+            on that machine.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="download">Download</h2>
+
+      <p>
+        VACE releases are distributed as a zip on GitHub Releases. The file is named
+        like this:
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">filename</span>
+        </div>
+        <pre><code>vace_engine_windows_stable_v0.1.zip</code></pre>
+      </div>
+
+      <p>
+        The download link will appear on the
+        <a href="https://github.com/IsaacAduDarko">Vanta Games GitHub</a> releases
+        page once the first stable release is published.
+      </p>
+
+      <h2 id="extract">Extract the zip</h2>
+
+      <p>
+        Extract the zip to a folder you own and can write to, for example
+        <code>C:\VACE\</code>. Do not extract inside Program Files, and do not run the
+        editor from inside the zip.
+      </p>
+
+      <p>
+        After extraction you should see:
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">vace_engine_windows_stable_v0.1/</span>
+        </div>
+        <pre><code>vace_engine_windows_stable_v0.1/
+├── build/
+│   └── windows-mingw-debug/
+│       └── projectmanager/
+│           └── VACE_ProjectManager.exe
+└── docs/</code></pre>
+      </div>
+
+      <p>
+        Keep this folder in place. Your projects live elsewhere. If you move the
+        engine folder later, you don't need to move your projects.
+      </p>
+
+      <h2 id="first-launch">First launch</h2>
+
+      <p>
+        Run <code>VACE_ProjectManager.exe</code> from:
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">path</span>
+        </div>
+        <pre><code>build\windows-mingw-debug\projectmanager\VACE_ProjectManager.exe</code></pre>
+      </div>
+
+      <p>
+        The Project Manager opens with an empty projects list. That is expected. From
+        here you can create or open projects. See
+        <a href="getting-started.html#step-3-create">Getting started &gt; Step 3</a>
+        for the project creation walkthrough.
+      </p>
+
+      <p>
+        The editor and Project Manager are not the same executable. The Project Manager
+        creates and opens projects. Once you open a project, the editor launches and
+        loads it.
+      </p>
+
+      <h2 id="toolchain">Setting up MinGW-w64 (optional)</h2>
+
+      <p>
+        You only need MinGW-w64 if you plan to write C++ scripts. If your project has
+        no scripts, skip this section entirely. Building and shipping a game does not
+        require a compiler on the player's machine.
+      </p>
+
+      <p>
+        CMake ships in the zip and is installed from the Project Manager, so the only
+        thing you download here is the compiler.
+      </p>
+
+      <h3>1. Download MinGW-w64</h3>
+
+      <p>
+        VACE is built and tested with the WinLibs build of MinGW-w64. Go to this
+        release page:
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">link</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>https://github.com/brechtsanders/winlibs_mingw/releases/tag/15.2.0posix-13.0.0-ucrt-r3</code></pre>
+      </div>
+
+      <p>
+        On that page, download the build whose file size is about <strong>252 MB</strong>.
+        The exact filename varies between WinLibs releases, but the size is the tell:
+        the 252 MB zip is the one you want. Ignore the smaller builds.
+      </p>
+
+      <p>
+        Extract the zip anywhere you like. Something like <code>C:\mingw64\</code> is
+        fine. Inside, you will find a <code>bin</code> folder containing
+        <code>g++.exe</code>, <code>gcc.exe</code>, and the rest of the toolchain.
+      </p>
+
+      <h3>2. Install CMake from the Project Manager</h3>
+
+      <p>
+        The VACE zip contains a CMake MSI. You install it from the Project Manager,
+        not by running the MSI yourself:
+      </p>
+
+      <ol>
+        <li>Open the Project Manager.</li>
+        <li>Open the <strong>Settings</strong> tab.</li>
+        <li>Click the button to install CMake. The Project Manager launches the MSI installer.</li>
+        <li>
+          In the CMake installer, make sure you tick the option to <strong>add CMake
+          to the system PATH</strong>. This is the only step where the CMake installer
+          asks you a question that matters.
+        </li>
+        <li>Finish the installer and return to the Project Manager.</li>
+      </ol>
+
+      <p>
+        When the installer closes, the Project Manager checks the system to confirm
+        CMake is now on the PATH. If it is, it shows a confirmation that setup is
+        complete. If not, it tells you what to check. The whole thing is automated
+        from the Project Manager side; you do not open a terminal.
+      </p>
+
+      <h3>3. Point the Project Manager at MinGW-w64</h3>
+
+      <p>
+        In the same <strong>Settings</strong> tab, the Project Manager has a
+        <strong>Browse</strong> button for the MinGW-w64 compiler folder. Click it and
+        select the <code>bin</code> folder inside the MinGW-w64 folder you extracted
+        (for example <code>C:\mingw64\bin</code>).
+      </p>
+
+      <figure class="doc-shot">
+        <img src="assets/screenshots/pm-settings.jpg" alt="VACE Project Manager settings with the MinGW-w64 browse button and CMake install controls" />
+        <figcaption>Project Manager: MinGW-w64 browse button and CMake install controls</figcaption>
+      </figure>
+
+      <p>
+        Once the path is selected, click <strong>Configure</strong>. The Project Manager:
+      </p>
+
+      <ul>
+        <li>Adds the selected <code>bin</code> folder to your environment variables, so you never touch PATH yourself</li>
+        <li>Verifies the compiler actually runs</li>
+        <li>Verifies CMake was configured correctly</li>
+        <li>Reports that everything is set up, or tells you what is wrong if something failed</li>
+      </ul>
+
+      <div class="doc-callout doc-callout--success">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">You only do this once</span>
+          <p>
+            After Configure finishes, VACE remembers the toolchain for every project
+            on that machine. You do not need to redo this unless you uninstall MinGW-w64,
+            move it to a different folder, or change your PATH manually in a way that
+            breaks the entries the Project Manager added.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="verifying">Verifying the install</h2>
+
+      <p>
+        To confirm the whole install works end to end:
+      </p>
+
+      <ol>
+        <li>Create a new project from the Project Manager.</li>
+        <li>Double-click it to open in the editor.</li>
+        <li>Create a scene, add a mesh, press Play.</li>
+        <li>If you set up MinGW-w64: create a script from the inspector, press Play, and confirm no build errors appear in the console.</li>
+      </ol>
+
+      <p>
+        If all four steps pass, the engine and (optionally) the toolchain are set up
+        correctly. If any fails, see the next section.
+      </p>
+
+      <h2 id="troubleshooting">Troubleshooting</h2>
+
+      <h3>Editor does not launch, or crashes immediately</h3>
+      <p>
+        OpenGL 4.3 is missing. Check your driver version, then use a tool like
+        <code>GPU-Z</code> (Windows) to see the reported OpenGL version. If your GPU
+        supports 4.3, update your graphics driver. If it does not, the engine will
+        not run on that hardware.
+      </p>
+
+      <h3>Project Manager opens but no projects appear</h3>
+      <p>
+        That is the expected first state. Use <strong>New Project</strong> to create
+        one. See <a href="getting-started.html#step-3-create">Getting started &gt; Step 3</a>.
+      </p>
+
+      <h3>Play does nothing or crashes with a script error</h3>
+      <p>
+        If the project has scripts, the compiler path is probably wrong. Open the
+        Project Manager's Settings tab, use Browse to re-select the folder containing
+        <code>g++.exe</code>, and click Configure again. If the project has no
+        scripts, this section does not apply.
+      </p>
+
+      <h3>The Project Manager says CMake is not configured</h3>
+      <p>
+        CMake was probably installed without the "add to PATH" option ticked. Re-run
+        the CMake install from the Project Manager's Settings tab and this time tick
+        that option. The Project Manager will re-check and confirm.
+      </p>
+
+      <h3>I downloaded the wrong WinLibs file</h3>
+      <p>
+        There are several builds on the WinLibs release page. The one VACE is tested
+        with is the <strong>252 MB</strong> download at:
+        <a href="https://github.com/brechtsanders/winlibs_mingw/releases/tag/15.2.0posix-13.0.0-ucrt-r3">15.2.0posix-13.0.0-ucrt-r3</a>.
+        Delete the wrong one and download the 252 MB zip.
+      </p>
+
+      <h3>I moved the engine folder and now projects fail to open</h3>
+      <p>
+        Projects store an absolute path to the engine root. If you move the engine,
+        you may need to reopen the project in the Project Manager, which will prompt
+        you to re-select the engine path.
+      </p>
+
+      <h3>Where do the docs live?</h3>
+      <p>
+        These pages are inside the engine's <code>docs/</code> folder. The editor's
+        <strong>Help &gt; Documentation</strong> menu opens them in your default
+        browser. No internet connection is required.
+      </p>
+
+      <!-- ============ PAGINATION ============ -->
+      <nav class="doc-pagination">
+        <a href="getting-started.html" class="doc-pagination__prev">
+          <span class="doc-pagination__label">Previous</span>
+          <span class="doc-pagination__title">Getting started</span>
+        </a>
+        <a href="editor.html" class="doc-pagination__next">
+          <span class="doc-pagination__label">Next</span>
+          <span class="doc-pagination__title">Editor walkthrough</span>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- ============ TOC ============ -->
+    <aside class="doc-toc" id="docToc">
+      <div class="doc-toc__label">On this page</div>
+      <nav class="doc-toc__list" id="docTocList"></nav>
+    </aside>
+
+  </div>
+
+  <button class="doc-top" id="docTop" title="Back to top">↑</button>
+
+  <script src="assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor walkthrough — VACE Docs</title>
+  <meta name="description" content="Walkthrough of the VACE editor: panels, Project Manager, Settings, scene and node creation, scripts, and Play." />
+  <link rel="stylesheet" href="assets/docs.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="doc-header">
+    <div class="doc-header__inner">
+      <button class="doc-header__toggle" id="docToggle" aria-label="Toggle navigation">☰</button>
+
+      <a href="index.html" class="doc-header__brand">
+        <img src="assets/img/vace-logo.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;margin-right:8px;" />
+        VACE <span class="doc-header__brand-badge">Docs</span>
+      </a>
+
+      <span class="doc-header__sep"></span>
+      <span class="doc-header__title">v0.1.0 · Windows x64</span>
+
+      <div class="doc-header__search">
+        <input type="search" placeholder="Search docs…  (press /)" aria-label="Search documentation" />
+      </div>
+
+      <div class="doc-header__actions">
+        <a href="https://github.com/IsaacAduDarko" class="doc-header__link">GitHub</a>
+        <a href="https://discord.gg/vjYZsQzuMq" class="doc-header__link">Discord</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-backdrop" id="docBackdrop"></div>
+
+  <!-- ============ LAYOUT ============ -->
+  <div class="doc-layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="doc-sidebar" id="docSidebar">
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Getting Started</span>
+        <a class="doc-sidebar__link" href="index.html">Overview</a>
+        <a class="doc-sidebar__link" href="getting-started.html">Getting started</a>
+        <a class="doc-sidebar__link" href="installation.html">Installation</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">The Editor</span>
+        <a class="doc-sidebar__link is-active" href="editor.html">Editor walkthrough</a>
+        <a class="doc-sidebar__link" href="editor.html#project-manager">Project Manager</a>
+        <a class="doc-sidebar__link" href="editor.html#settings">Settings</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Scripting</span>
+        <a class="doc-sidebar__link" href="scripting.html">Script API reference</a>
+        <a class="doc-sidebar__link" href="scripting.html#intro">Introduction</a>
+        <a class="doc-sidebar__link" href="scripting.html#fields">Inspector fields</a>
+        <a class="doc-sidebar__link" href="scripting.html#input">Input</a>
+        <a class="doc-sidebar__link" href="scripting.html#transform">Transform</a>
+        <a class="doc-sidebar__link" href="scripting.html#physics">Physics</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Reference</span>
+        <a class="doc-sidebar__link" href="abi.html">ABI &amp; types</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">About</span>
+        <a class="doc-sidebar__link" href="about.html">Vanta Games</a>
+        <a class="doc-sidebar__link" href="about.html#contact">Contact</a>
+        <a class="doc-sidebar__link" href="about.html#changelog">Changelog</a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="doc-content" id="docContent">
+
+      <nav class="doc-breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <a href="editor.html">The editor</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <span>Walkthrough</span>
+      </nav>
+
+      <h1>Editor walkthrough</h1>
+
+      <p class="doc-lede">
+        A tour of the VACE editor and the Project Manager. Covers the layout, the
+        panels, how to create a scene, how to add nodes, how to attach a script, and
+        how Play works. If you have not opened the editor yet, start with
+        <a href="getting-started.html">Getting started</a>.
+      </p>
+
+      <h2 id="layout">Editor layout</h2>
+
+      <p>
+        The editor is a single window divided into a few panels. The default layout
+        puts the scene hierarchy on one side, the viewport in the middle, the inspector
+        and console around it. You can resize panels by dragging their borders.
+      </p>
+
+      <figure class="doc-shot">
+        <img src="assets/screenshots/editor-scene.jpg" alt="VACE editor showing a 3D scene with the hierarchy, viewport, inspector, and console" />
+        <figcaption>The editor with a 3D scene open</figcaption>
+      </figure>
+
+      <h3>The panels</h3>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Panel</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Hierarchy</strong></td>
+            <td>The scene as a tree of nodes. Every node in the current scene lives here. Use the plus button at the top to add nodes.</td>
+          </tr>
+          <tr>
+            <td><strong>Viewport</strong></td>
+            <td>The 3D or 2D view of the scene. When you press Play and the scene has no camera, the editor camera is used.</td>
+          </tr>
+          <tr>
+            <td><strong>Inspector</strong></td>
+            <td>The properties of the currently selected node. Change its name, its transform, its components, and the scripts attached to it.</td>
+          </tr>
+          <tr>
+            <td><strong>Console</strong></td>
+            <td>Script logs and engine messages. Every <code>LogInfo</code>, <code>LogWarning</code>, and <code>LogError</code> from your scripts shows up here while playing.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="scenes">Scenes</h2>
+
+      <p>
+        A project is a collection of scenes. Each scene has its own node tree, and the
+        runtime loads one scene at a time. A brand new project opens to a prompt telling
+        you to create your first scene; until you do, the hierarchy and viewport stay
+        empty.
+      </p>
+
+      <p>
+        To create a scene, use the scene menu or the prompt shown in the viewport.
+        VACE creates the scene file, shows an empty hierarchy, and you can start adding
+        nodes. Save the scene when prompted.
+      </p>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Scenes are the unit of play</span>
+          <p>
+            Pressing Play runs the current scene. To run a different scene, open it
+            first. Scripts can also load other scenes at runtime via
+            <code>LoadScene</code>; see the <a href="scripting.html#scene-loading">Script API</a>.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="nodes">Adding nodes</h2>
+
+      <p>
+        Nodes are the objects that make up a scene. Every object in the game world
+        (a mesh, a sprite, a light, a camera, a sound emitter, a UI widget, a physics
+        body) is a node, and every script runs attached to a node.
+      </p>
+
+      <p>
+        To add a node, click the <strong>plus button</strong> at the top of the
+        Hierarchy panel. A menu opens split into:
+      </p>
+
+      <ul>
+        <li><strong>Node 3D</strong>: meshes, 3D cameras, lights, 3D physics bodies, and other 3D scene objects</li>
+        <li><strong>Node 2D</strong>: sprites, 2D cameras, 2D physics bodies, and other 2D scene objects</li>
+      </ul>
+
+      <p>
+        Pick the type that matches what you want. The node appears in the hierarchy
+        and in the viewport, selected. Use the inspector on the right to change its
+        name, transform, and components.
+      </p>
+
+      <h3>No camera is fine</h3>
+
+      <p>
+        If the scene has no camera node when you press Play, VACE uses the editor
+        camera. You only need to add a camera node if the game itself needs a specific
+        view (a first-person camera on a player, a follow camera, a fixed camera for a
+        cutscene, and so on).
+      </p>
+
+      <h2 id="inspector">Inspector</h2>
+
+      <p>
+        The Inspector shows the currently selected node. It is how you edit everything
+        about a node: its name, its transform (position, rotation, scale), its components
+        (mesh renderer, collider, light, audio source, and so on), and any scripts
+        attached to it.
+      </p>
+
+      <p>
+        Select a node in the hierarchy to load its properties into the inspector. When
+        you change a value in the inspector, it is applied to the scene immediately.
+        While the scene is playing, changes apply live and revert when you press Stop.
+      </p>
+
+      <h2 id="scripts">Scripts</h2>
+
+      <p>
+        Scripts are C++ files compiled into a <code>.dll</code> and attached to nodes.
+        You create and attach scripts from the inspector:
+      </p>
+
+      <ol>
+        <li>Select a node in the hierarchy.</li>
+        <li>In the inspector, find the script section.</li>
+        <li>Either <strong>create a new script</strong> (VACE writes a starter <code>.cpp</code> into your project) or <strong>attach an existing script</strong> from the project's scripts folder.</li>
+      </ol>
+
+      <p>
+        Scripts use the <code>VACE::Script</code> base class. Press Play to build and
+        run them; VACE compiles out-of-date script DLLs automatically before the scene
+        starts. The full scripting surface, from lifecycle hooks to input to physics to
+        JSON save data, is in the <a href="scripting.html">Script API reference</a>.
+      </p>
+
+      <div class="doc-callout doc-callout--warn">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Scripting requires MinGW-w64</span>
+          <p>
+            If your project has no scripts, you never need a compiler. If you do write
+            scripts, set up MinGW-w64 once from the Project Manager's Settings tab;
+            see <a href="installation.html#toolchain">Installation &gt; Setting up MinGW-w64</a>.
+            The toolchain is only used to build script DLLs, not to ship the game.
+          </p>
+        </div>
+      </div>
+
+      <h3>Inspector fields</h3>
+
+      <p>
+        Marking a public member with <code>VACE_FIELD()</code> makes it show up in the
+        inspector. This feature is still under active development: fields reflect in
+        the editor and can be edited, but <strong>editing them in the inspector does
+        not yet change the value the running script sees</strong>. Until this is
+        finished, set default values directly in the class body.
+      </p>
+
+      <h2 id="play">Play mode</h2>
+
+      <p>
+        Press the Play button to run the current scene. Play builds any script DLLs
+        that are out of date, then launches the scene with the editor still attached,
+        so you can watch the console, tweak values in the inspector, and pause or stop
+        at any time.
+      </p>
+
+      <ul>
+        <li><strong>Play</strong>: build scripts if needed, start the scene.</li>
+        <li><strong>Pause</strong>: freeze the scene. The viewport and inspector stay responsive.</li>
+        <li><strong>Stop</strong>: end the scene and restore it to its pre-play state.</li>
+      </ul>
+
+      <p>
+        Changes you make in the inspector while the scene is playing are applied live.
+        They are reverted when you stop, so you do not have to worry about accidentally
+        saving a Play-session tweak to the scene.
+      </p>
+
+      <h2 id="project-manager">Project Manager</h2>
+
+      <p>
+        The Project Manager is a separate executable that runs before the editor. It
+        is where you create projects, open them, and configure the machine's toolchain.
+        You can also return to it from inside the editor at any time.
+      </p>
+
+      <figure class="doc-shot">
+        <img src="assets/screenshots/pm-projects.jpg" alt="VACE Project Manager projects list" />
+        <figcaption>Project Manager: the projects list</figcaption>
+      </figure>
+
+      <h3>Creating a project</h3>
+
+      <p>
+        Click <strong>New Project</strong>. You'll be asked for:
+      </p>
+
+      <ul>
+        <li><strong>Name</strong>: shown in the editor title bar and used as the project folder name</li>
+        <li><strong>Type</strong>: <strong>2D</strong> or <strong>3D</strong>. Sets the default scene mode and node mode for the project</li>
+        <li><strong>Path</strong>: the parent folder for the new project</li>
+        <li><strong>Add .gitignore</strong>: a checkbox. Leave it on if you keep the project in git</li>
+      </ul>
+
+      <p>
+        Confirming creates the project folder and its starter files. No build runs at
+        this point, and no compiler is needed. Double-click the project in the list to
+        open it in the editor.
+      </p>
+
+      <h3>Opening a project</h3>
+
+      <p>
+        Double-click an existing project in the list. The editor launches with that
+        project loaded. The Project Manager itself stays open in the background so you
+        can come back to it.
+      </p>
+
+      <h2 id="settings">Settings</h2>
+
+      <p>
+        The Settings tab is where you configure the machine's toolchain. You only need
+        it if you plan to write C++ scripts.
+      </p>
+
+      <figure class="doc-shot">
+        <img src="assets/screenshots/pm-settings.jpg" alt="VACE Project Manager settings with the MinGW-w64 browse button and CMake install controls" />
+        <figcaption>Project Manager: toolchain settings</figcaption>
+      </figure>
+
+      <h3>MinGW-w64</h3>
+
+      <p>
+        Download the WinLibs MinGW-w64 build (the 252 MB zip from
+        <a href="https://github.com/brechtsanders/winlibs_mingw/releases/tag/15.2.0posix-13.0.0-ucrt-r3">15.2.0posix-13.0.0-ucrt-r3</a>),
+        extract it, then use the Settings tab's <strong>Browse</strong> button to select
+        the <code>bin</code> folder inside it. Click <strong>Configure</strong> and the
+        Project Manager adds it to your environment variables and verifies the compiler
+        runs. You never edit PATH yourself.
+      </p>
+
+      <h3>CMake</h3>
+
+      <p>
+        CMake is bundled with the VACE zip as an MSI. From the Settings tab, click the
+        button to install CMake. The Project Manager launches the installer. In the
+        installer, tick the option to <strong>add CMake to the system PATH</strong>, then
+        finish. When you return to the Project Manager, it verifies CMake is on the
+        PATH and reports that setup is complete.
+      </p>
+
+      <div class="doc-callout doc-callout--success">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">You only do this once</span>
+          <p>
+            After the toolchain is configured, VACE remembers it for every project on
+            the machine. You do not need to redo this unless you uninstall or move
+            MinGW-w64, or change your PATH in a way that breaks the entries the Project
+            Manager added.
+          </p>
+        </div>
+      </div>
+
+     
+  
+
+      <!-- ============ PAGINATION ============ -->
+      <nav class="doc-pagination">
+        <a href="installation.html" class="doc-pagination__prev">
+          <span class="doc-pagination__label">Previous</span>
+          <span class="doc-pagination__title">Installation</span>
+        </a>
+        <a href="scripting.html" class="doc-pagination__next">
+          <span class="doc-pagination__label">Next</span>
+          <span class="doc-pagination__title">Script API reference</span>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- ============ TOC ============ -->
+    <aside class="doc-toc" id="docToc">
+      <div class="doc-toc__label">On this page</div>
+      <nav class="doc-toc__list" id="docTocList"></nav>
+    </aside>
+
+  </div>
+
+  <button class="doc-top" id="docTop" title="Back to top">↑</button>
+
+  <script src="assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Vanta Games — VACE Docs</title>
+  <meta name="description" content="About Vanta Games: the developers behind VACE, how the engine came to be, contact details, license, and changelog." />
+  <link rel="stylesheet" href="assets/docs.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="doc-header">
+    <div class="doc-header__inner">
+      <button class="doc-header__toggle" id="docToggle" aria-label="Toggle navigation">☰</button>
+
+      <a href="index.html" class="doc-header__brand">
+        <img src="assets/img/vace-logo.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;margin-right:8px;" />
+        VACE <span class="doc-header__brand-badge">Docs</span>
+      </a>
+
+      <span class="doc-header__sep"></span>
+      <span class="doc-header__title">v0.1.0 · Windows x64</span>
+
+      <div class="doc-header__search">
+        <input type="search" placeholder="Search docs…  (press /)" aria-label="Search documentation" />
+      </div>
+
+      <div class="doc-header__actions">
+        <a href="https://github.com/IsaacAduDarko" class="doc-header__link">GitHub</a>
+        <a href="https://discord.gg/vjYZsQzuMq" class="doc-header__link">Discord</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-backdrop" id="docBackdrop"></div>
+
+  <!-- ============ LAYOUT ============ -->
+  <div class="doc-layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="doc-sidebar" id="docSidebar">
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Getting Started</span>
+        <a class="doc-sidebar__link" href="index.html">Overview</a>
+        <a class="doc-sidebar__link" href="getting-started.html">Getting started</a>
+        <a class="doc-sidebar__link" href="installation.html">Installation</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">The Editor</span>
+        <a class="doc-sidebar__link" href="editor.html">Editor walkthrough</a>
+        <a class="doc-sidebar__link" href="editor.html#project-manager">Project Manager</a>
+        <a class="doc-sidebar__link" href="editor.html#settings">Settings</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Scripting</span>
+        <a class="doc-sidebar__link" href="scripting.html">Script API reference</a>
+        <a class="doc-sidebar__link" href="scripting.html#intro">Introduction</a>
+        <a class="doc-sidebar__link" href="scripting.html#fields">Inspector fields</a>
+        <a class="doc-sidebar__link" href="scripting.html#input">Input</a>
+        <a class="doc-sidebar__link" href="scripting.html#transform">Transform</a>
+        <a class="doc-sidebar__link" href="scripting.html#physics">Physics</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Reference</span>
+        <a class="doc-sidebar__link" href="abi.html">ABI &amp; types</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">About</span>
+        <a class="doc-sidebar__link is-active" href="about.html">Vanta Games</a>
+        <a class="doc-sidebar__link" href="about.html#contact">Contact</a>
+        <a class="doc-sidebar__link" href="about.html#changelog">Changelog</a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="doc-content" id="docContent">
+
+      <nav class="doc-breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <a href="about.html">About</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <span>Vanta Games</span>
+      </nav>
+
+      <h1>About Vanta Games</h1>
+
+      <p class="doc-lede">
+        Vanta Games is a small studio building VACE, a C++ game engine with a full
+        editor, and the games that run on it. VACE is free to use. This page covers
+        who works on it, how it came to be, how to reach us, and the license terms.
+      </p>
+
+      <div style="text-align:center;margin:32px 0 40px;">
+        <img src="assets/img/vanta white.png" alt="Vanta Games logo" style="max-width:180px;height:auto;" />
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="team">The team</h2>
+
+      <p>Vanta Games is made up of two people.</p>
+
+      <h3>Isaac Adu Darko</h3>
+
+      <p>
+        <strong>CEO and Lead Programmer.</strong> Isaac designed and built VACE from
+        scratch: the renderer, the ECS core, the editor, the physics integration, the
+        scripting ABI, and the toolchain automation in the Project Manager. He works
+        on the engine daily and drives its direction.
+      </p>
+
+      <h3>Lordin Adu Darko</h3>
+
+      <p>
+        <strong>Assistant Programmer.</strong> Lordin contributes to engine
+        development, gameplay code, and the Vanta Games titles being built on VACE.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="origin">How VACE came to be</h2>
+
+      <p>
+        VACE was not started as a commercial product. It grew out of a practical
+        problem: the developers have always worked on low-end hardware, and the engines
+        available at the time either did not run well on it or required a workflow that
+        did not fit.
+      </p>
+
+      <p>
+        The engine was built on a <strong>13-year-old Toshiba laptop</strong> (4th
+        generation Intel Core i5, 8 GB of RAM, a GPU with no Vulkan support and no
+        DirectX 12 support). Everything in VACE had to be efficient enough to develop
+        and test on that machine, which shaped many of the engine's design decisions.
+      </p>
+
+      <p>Before VACE, the same idea was attempted three times:</p>
+
+      <ol>
+        <li><strong>Two JavaScript and WebGL prototypes.</strong> These proved the core concepts but ran into the limits of the browser and the language for a full engine.</li>
+        <li><strong>A C++ engine on OpenGL 3.3.</strong> This was the first native attempt and worked, but its architecture did not leave room to grow.</li>
+        <li><strong>VACE today.</strong> A re-architecture on OpenGL 4.3 with an expandable design, built from the lessons of the earlier attempts. The renderer, physics, scripting, and editor are all structured so that new features and backends can be added without rewriting the engine.</li>
+      </ol>
+
+      <p>
+        Vanta Games now uses VACE to develop its own games, and the engine continues
+        to be expanded alongside that work.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="license">License</h2>
+
+      <p>
+        VACE is <strong>free to use</strong>. You can download it, make games with it,
+        and ship those games at no cost.
+      </p>
+
+      <p>
+        The source code is <strong>not open source</strong>. The engine is distributed
+        as a binary release (editor, runtime, libraries, and headers). You may read the
+        engine headers to write scripts against the API, but you may not redistribute
+        or modify the engine itself.
+      </p>
+
+      <p>
+        Vanta Games has plans to keep VACE free going forward if the project receives
+        enough support from its users. If the situation changes, existing releases will
+        remain available under the terms they were released with, and any future
+        licensing changes will be announced clearly in the release notes.
+      </p>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">In short</span>
+          <ul>
+            <li>Using VACE to build and ship games: <strong>free</strong></li>
+            <li>Reading the headers to write scripts: <strong>allowed</strong></li>
+            <li>Redistributing or modifying the engine: <strong>not allowed</strong></li>
+            <li>Source code release: <strong>not planned at this time</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="contact">Contact</h2>
+
+      <p>
+        The fastest way to reach Vanta Games is the Discord server. Bug reports,
+        feature requests, and general questions all land there. Email and GitHub work
+        too if you prefer.
+      </p>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Channel</th><th>Where</th><th>Best for</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Discord</strong></td>
+            <td><a href="https://discord.gg/vjYZsQzuMq">discord.gg/vjYZsQzuMq</a></td>
+            <td>Fastest response. Bug reports, questions, feature requests, and general chat.</td>
+          </tr>
+          <tr>
+            <td><strong>Email</strong></td>
+            <td><a href="mailto:isaacadudarko1@gmail.com">isaacadudarko1@gmail.com</a></td>
+            <td>Direct contact with Isaac for anything you would rather not post publicly.</td>
+          </tr>
+          <tr>
+            <td><strong>GitHub</strong></td>
+            <td><a href="https://github.com/IsaacAduDarko">github.com/IsaacAduDarko</a></td>
+            <td>Issues, and the release downloads once they are published.</td>
+          </tr>
+          <tr>
+            <td><strong>YouTube</strong></td>
+            <td><a href="https://youtube.com/@vantagamesstudio">youtube.com/@vantagamesstudio</a></td>
+            <td>Devlogs and engine showcase videos.</td>
+          </tr>
+          <tr>
+            <td><strong>TikTok</strong></td>
+            <td><a href="https://www.tiktok.com/@vantagamesstudio">tiktok.com/@vantagamesstudio</a></td>
+            <td>Short clips of engine progress and demos.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Before you post a bug report</span>
+          <p>
+            If the problem is a crash, a script that will not load, or a build error,
+            include the console output from the editor. It usually contains the exact
+            error, which speeds up a fix a lot. If you are on the Discord, the
+            <code>#bug-reports</code> channel has a template.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="changelog">Changelog</h2>
+
+      <h3 id="changelog-v010">v0.1.0</h3>
+
+      <p>
+        The first public release of VACE. Editor, runtime, and bundled documentation.
+      </p>
+
+      <p><strong>Rendering</strong></p>
+      <ul>
+        <li>OpenGL 4.3 renderer behind an abstraction layer for future backends</li>
+        <li>PBR pipeline with HDR rendering, IBL, SSAO, bloom, and tone mapping</li>
+        <li>Dynamic lighting and anti-aliasing</li>
+        <li>Material system with data-driven shaders</li>
+        <li>Shader graph</li>
+      </ul>
+
+      <p><strong>Physics</strong></p>
+      <ul>
+        <li>Jolt Physics for 3D</li>
+        <li>Box2D for 2D</li>
+      </ul>
+
+      <p><strong>Scripting</strong></p>
+      <ul>
+        <li>C++ scripting via <code>VACE::Script</code>, ABI v7</li>
+        <li>Visual scripting</li>
+        <li>Plugin system</li>
+      </ul>
+
+      <p><strong>Animation and content</strong></p>
+      <ul>
+        <li>Skeletal and sprite animation</li>
+        <li>Animation timeline</li>
+        <li>Spritesheet editor</li>
+        <li>Inverse kinematics</li>
+        <li>Particle system</li>
+      </ul>
+
+      <p><strong>UI and input</strong></p>
+      <ul>
+        <li>UI system (text, buttons, sliders, images, colors, interaction events)</li>
+        <li>Input (keyboard, mouse, gamepads, named actions)</li>
+      </ul>
+
+      <p><strong>Architecture and tooling</strong></p>
+      <ul>
+        <li>ECS core</li>
+        <li>JSON save data</li>
+        <li>Editor: scene tree, inspector, viewport, console, project manager, toolchain settings</li>
+        <li>Project Manager with automated MinGW-w64 and CMake setup</li>
+      </ul>
+
+      <p><strong>Known limitations in v0.1.0</strong></p>
+      <ul>
+        <li><code>VACE_FIELD()</code> inspector fields reflect in the editor but editing them does not yet change the value the running script sees</li>
+        <li>Windows only; other platforms are planned but not shipped</li>
+        <li>Some editor panels and settings may change in future releases</li>
+      </ul>
+
+      <!-- ============ PAGINATION ============ -->
+      <nav class="doc-pagination">
+        <a href="abi.html" class="doc-pagination__prev">
+          <span class="doc-pagination__label">Previous</span>
+          <span class="doc-pagination__title">ABI and types</span>
+        </a>
+        <a href="index.html" class="doc-pagination__next">
+          <span class="doc-pagination__label">Back to</span>
+          <span class="doc-pagination__title">Overview</span>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- ============ TOC ============ -->
+    <aside class="doc-toc" id="docToc">
+      <div class="doc-toc__label">On this page</div>
+      <nav class="doc-toc__list" id="docTocList"></nav>
+    </aside>
+
+  </div>
+
+  <button class="doc-top" id="docTop" title="Back to top">↑</button>
+
+  <script src="assets/docs.js"></script>
+</body>
+</html>

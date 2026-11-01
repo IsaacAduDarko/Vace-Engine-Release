@@ -1,0 +1,22 @@
+{
+    "format": "vcap",
+    "version": 1,
+    "clips": [
+        {
+            "name": "test_move",
+            "duration": 2.0,
+            "looping": true,
+            "tracks": [
+                {
+                    "kind": "transform",
+                    "target": "self",
+                    "keyframes": [
+                        { "t": 0.0, "pos": [0,0,0], "rot": [1,0,0,0], "scale": [1,1,1] },
+                        { "t": 1.0, "pos": [5,0,0], "rot": [1,0,0,0], "scale": [1,1,1] },
+                        { "t": 2.0, "pos": [0,0,0], "rot": [1,0,0,0], "scale": [1,1,1] }
+                    ]
+                }
+            ]
+        }
+    ]
+}

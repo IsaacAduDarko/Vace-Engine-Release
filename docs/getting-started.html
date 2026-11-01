@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started — VACE Docs</title>
+  <meta name="description" content="First steps with VACE: run the Project Manager, create a project, open it in the editor, add a scene and nodes, and press Play." />
+  <link rel="stylesheet" href="assets/docs.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="doc-header">
+    <div class="doc-header__inner">
+      <button class="doc-header__toggle" id="docToggle" aria-label="Toggle navigation">☰</button>
+
+      <a href="index.html" class="doc-header__brand">
+        <img src="assets/img/vace-logo.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;margin-right:8px;" />
+        VACE <span class="doc-header__brand-badge">Docs</span>
+      </a>
+
+      <span class="doc-header__sep"></span>
+      <span class="doc-header__title">v0.1.0 · Windows x64</span>
+
+      <div class="doc-header__search">
+        <input type="search" placeholder="Search docs…  (press /)" aria-label="Search documentation" />
+      </div>
+
+      <div class="doc-header__actions">
+        <a href="https://github.com/IsaacAduDarko" class="doc-header__link">GitHub</a>
+        <a href="https://discord.gg/vjYZsQzuMq" class="doc-header__link">Discord</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-backdrop" id="docBackdrop"></div>
+
+  <!-- ============ LAYOUT ============ -->
+  <div class="doc-layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="doc-sidebar" id="docSidebar">
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Getting Started</span>
+        <a class="doc-sidebar__link" href="index.html">Overview</a>
+        <a class="doc-sidebar__link is-active" href="getting-started.html">Getting started</a>
+        <a class="doc-sidebar__link" href="installation.html">Installation</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">The Editor</span>
+        <a class="doc-sidebar__link" href="editor.html">Editor walkthrough</a>
+        <a class="doc-sidebar__link" href="editor.html#project-manager">Project Manager</a>
+        <a class="doc-sidebar__link" href="editor.html#settings">Settings</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Scripting</span>
+        <a class="doc-sidebar__link" href="scripting.html">Script API reference</a>
+        <a class="doc-sidebar__link" href="scripting.html#intro">Introduction</a>
+        <a class="doc-sidebar__link" href="scripting.html#fields">Inspector fields</a>
+        <a class="doc-sidebar__link" href="scripting.html#input">Input</a>
+        <a class="doc-sidebar__link" href="scripting.html#transform">Transform</a>
+        <a class="doc-sidebar__link" href="scripting.html#physics">Physics</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">Reference</span>
+        <a class="doc-sidebar__link" href="abi.html">ABI &amp; types</a>
+      </div>
+
+      <div class="doc-sidebar__group">
+        <span class="doc-sidebar__label">About</span>
+        <a class="doc-sidebar__link" href="about.html">Vanta Games</a>
+        <a class="doc-sidebar__link" href="about.html#contact">Contact</a>
+        <a class="doc-sidebar__link" href="about.html#changelog">Changelog</a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="doc-content" id="docContent">
+
+      <nav class="doc-breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <a href="getting-started.html">Getting started</a>
+        <span class="doc-breadcrumb__sep">/</span>
+        <span>First steps</span>
+      </nav>
+
+      <h1>Getting started</h1>
+
+      <p class="doc-lede">
+        This page walks you from a fresh download to a scene that plays. You do not
+        need a C++ compiler or CMake to use the editor or ship a game. Those are only
+        required when you want to write C++ scripts, and you set them once.
+      </p>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">The short version</span>
+          <p>
+            Extract <code>vace_engine_windows_stable_v0.1.zip</code>, run
+            <code>build\windows-mingw-debug\projectmanager\VACE_ProjectManager.exe</code>,
+            create a project, double-click to open it in the editor, create a scene,
+            add nodes, press Play.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="step-1-extract">Step 1: extract the release</h2>
+
+      <p>
+        Download <code>vace_engine_windows_stable_v0.1.zip</code> and extract it to a
+        folder you can write to. Do not run the editor from inside the zip. The
+        extracted folder contains the runtime, the engine libraries, the editor, and
+        the Project Manager:
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">vace_engine_windows_stable_v0.1/</span>
+        </div>
+        <pre><code>vace_engine_windows_stable_v0.1/
+├── build/
+│   └── windows-mingw-debug/
+│       └── projectmanager/
+│           └── VACE_ProjectManager.exe    ← start here
+└── docs/             this documentation</code></pre>
+      </div>
+
+      <p>
+        Your projects live <em>outside</em> this folder. The extracted release is the
+        engine. Keep it somewhere stable (for example <code>C:\VACE\</code>) and
+        create projects wherever you keep code.
+      </p>
+
+      <h2 id="step-2-project-manager">Step 2: run the Project Manager</h2>
+
+      <p>
+        Launch the Project Manager from:
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">path</span>
+        </div>
+        <pre><code>build\windows-mingw-debug\projectmanager\VACE_ProjectManager.exe</code></pre>
+      </div>
+
+      <p>
+        This is the first window you see, and it is where you create and open
+        projects. There is no separate launcher.
+      </p>
+
+      <figure class="doc-shot">
+        <img src="assets/screenshots/pm-projects.jpg" alt="VACE Project Manager projects list" />
+        <figcaption>Project Manager: the projects list</figcaption>
+      </figure>
+
+      <p>
+        If this is your first launch, the list is empty. That is expected. The next
+        step creates your first project.
+      </p>
+
+      <h2 id="step-3-create">Step 3: create a project</h2>
+
+      <p>
+        Choose <strong>New Project</strong>. You'll be asked for four things:
+      </p>
+
+      <ul>
+        <li><strong>Name</strong>: shown in the editor title bar and used as the project folder name</li>
+        <li><strong>Type</strong>: <strong>2D</strong> or <strong>3D</strong>. This sets the default scene and node mode for the project</li>
+        <li><strong>Path</strong>: the parent folder for the new project</li>
+        <li><strong>Add .gitignore</strong>: a checkbox. Leave it on if you keep the project in git, off otherwise</li>
+      </ul>
+
+      <p>
+        When you confirm, VACE creates the project folder and its starter files. No
+        build runs at this point, and no compiler is needed.
+      </p>
+
+      <h2 id="step-4-open">Step 4: open the project in the editor</h2>
+
+      <p>
+        In the Project Manager, <strong>double-click</strong> your project in the
+        list. The editor opens with that project loaded.
+      </p>
+
+      <p>
+        If you need to create another project later, you can return to the Project
+        Manager from inside the editor at any time. Project creation is a Project
+        Manager action, not an editor one.
+      </p>
+
+      <h2 id="step-5-first-scene">Step 5: create your first scene</h2>
+
+      <p>
+        A new project opens to a cue telling you to create a scene. The scene tree
+        and viewport stay empty until you do.
+      </p>
+
+      <figure class="doc-shot">
+        <img src="assets/screenshots/editor-scene.jpg" alt="VACE editor with a scene open" />
+        <figcaption>The editor after creating a scene, with a node added</figcaption>
+      </figure>
+
+      <p>
+        Use the scene menu (or the prompt shown in the viewport) to create a new
+        scene. Once the scene exists, the editor shows the empty scene tree and you
+        can start adding nodes. Save the scene when prompted.
+      </p>
+
+      <h2 id="step-6-add-nodes">Step 6: add your first nodes</h2>
+
+      <p>
+        Add nodes from the <strong>plus button</strong> at the top of the hierarchy
+        panel. Clicking it opens a menu split into <strong>Node 3D</strong> and
+        <strong>Node 2D</strong>. Pick whichever matches your project type (a 3D
+        project starts with 3D nodes, a 2D project with 2D nodes, but either list is
+        available):
+      </p>
+
+      <ul>
+        <li><strong>Node 3D</strong>: meshes, cameras, lights, and other 3D scene objects</li>
+        <li><strong>Node 2D</strong>: sprites, 2D cameras, and other 2D scene objects</li>
+      </ul>
+
+      <p>
+        Select a node after adding it and use the inspector on the right to change
+        its name, transform, and components.
+      </p>
+
+      <div class="doc-callout doc-callout--info">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">No camera is fine on Play</span>
+          <p>
+            If the scene has no camera node when you press Play, VACE uses the editor
+            camera. You only need to add a camera to the scene if the game itself
+            needs a specific view.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="step-7-script">Step 7: write your first script (optional)</h2>
+
+      <p>
+        C++ scripting is optional. Everything above works without a compiler. You
+        only need a toolchain when you want to attach a script to a node.
+      </p>
+
+      <p>
+        To add a script, use the <strong>inspector</strong> on a selected node. The
+        inspector has controls to <strong>create a new script</strong> or
+        <strong>attach an existing one</strong>. Both flows stay in the editor; you
+        do not need to leave it to make a script.
+      </p>
+
+      <p>
+        When you create a script, VACE writes a <code>.cpp</code> into the project's
+        scripts folder. Here is what a minimal script looks like:
+      </p>
+
+      <div class="doc-code">
+        <div class="doc-code__head">
+          <span class="doc-code__dots"><span></span><span></span><span></span></span>
+          <span class="doc-code__lang">Spinner.cpp</span>
+          <button class="doc-code__copy" type="button">Copy</button>
+        </div>
+        <pre><code>#include "VACE/Scripting/Script.hpp"
+
+class Spinner : public VACE::Script
+{
+public:
+    void OnUpdate(float dt) override
+    {
+        SetRotation2D(GetRotation2D() + glm::radians(90.0f) * dt);
+    }
+};
+
+VACE_REGISTER_SCRIPT(Spinner)</code></pre>
+      </div>
+
+      <p>
+        The full scripting surface, from input to physics to JSON save data, is in
+        the <a href="scripting.html">Script API reference</a>.
+      </p>
+
+      <h2 id="step-8-toolchain">Step 8: set the toolchain (only for C++ scripting)</h2>
+
+      <p>
+        The first time you write or attach a C++ script, VACE needs to know where
+        your compiler and CMake are. Open the Project Manager's
+        <strong>Settings</strong> tab and fill in:
+      </p>
+
+      <ul>
+        <li><strong>CMake path</strong>: full path to <code>cmake.exe</code></li>
+        <li><strong>Compiler</strong>: MinGW-w64</li>
+        <li><strong>Compiler path</strong>: path to the toolchain, if not auto-detected</li>
+      </ul>
+
+      <figure class="doc-shot">
+        <img src="assets/screenshots/pm-settings.jpg" alt="VACE Project Manager settings page with compiler and CMake fields" />
+        <figcaption>Project Manager: toolchain settings (compiler and CMake)</figcaption>
+      </figure>
+
+      <p>
+        You only do this <strong>once per machine</strong>. After the toolchain is
+        set, you never need to configure it again unless you change compilers or move
+        the install.
+      </p>
+
+      <div class="doc-callout doc-callout--warn">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">Shipping does not need a compiler</span>
+          <p>
+            The toolchain is only used to build script <code>.dll</code> files. Building
+            and shipping a game does not require a compiler to be installed on the
+            player's machine. If a project has no scripts, it needs no toolchain at all.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="step-9-play">Step 9: press Play</h2>
+
+      <p>
+        Press the Play button. VACE automatically builds any script DLLs that are out
+        of date, then runs the scene with the editor attached. You'll see script logs
+        in the console, and changes you make in the inspector while playing are applied
+        live. Press Stop to return the scene to its pre-play state.
+      </p>
+
+      <div class="doc-callout doc-callout--success">
+        <div class="doc-callout__body">
+          <span class="doc-callout__title">You have a running scene</span>
+          <p>
+            From here, the editor walkthrough covers the panels in depth, and the
+            scripting reference covers the full API. If you get stuck, the
+            <a href="about.html#contact">Contact page</a> lists every way to reach
+            the developer.
+          </p>
+        </div>
+      </div>
+
+      <h2 id="inspector-fields-note">A note on inspector fields</h2>
+
+      <p>
+        <code>VACE_FIELD()</code> is still under active development. Fields marked
+        with it currently show up in the editor inspector and can be edited there,
+        but <strong>editing them in the inspector does not yet change the value the
+        running script sees</strong>. Until this is finished, treat inspector fields
+        as documentation for now, and set default values directly in the class body.
+      </p>
+
+      <p>
+        This is a known limitation and will change in a future release. The rest of
+        the scripting API works as documented.
+      </p>
+
+      <h2 id="common-issues">Common first-run issues</h2>
+
+      <h3>No scene appears when I open the project</h3>
+      <p>
+        That is the expected first state. The editor shows a prompt to create a scene.
+        Create one, save it, then add nodes.
+      </p>
+
+      <h3>Play does nothing visible</h3>
+      <p>
+        Either the scene has no camera and the editor camera is pointed away from the
+        action, or there are no visible nodes yet. Add a mesh or sprite near the
+        origin and try Play again.
+      </p>
+
+      <h3>Scripts fail to build</h3>
+      <p>
+        The most common cause is a missing or mismatched toolchain. Open
+        <a href="editor.html#settings">Project Manager &gt; Settings</a> and re-check
+        the CMake and compiler paths. If the project has no scripts, you can ignore
+        this entirely.
+      </p>
+
+      <h3>Editor crashes on launch</h3>
+      <p>
+        Check that your GPU reports OpenGL 4.3 support. The renderer requires it. If
+        your GPU supports 4.3, update your graphics driver and try again.
+      </p>
+
+      <!-- ============ PAGINATION ============ -->
+      <nav class="doc-pagination">
+        <a href="index.html" class="doc-pagination__prev">
+          <span class="doc-pagination__label">Previous</span>
+          <span class="doc-pagination__title">Overview</span>
+        </a>
+        <a href="installation.html" class="doc-pagination__next">
+          <span class="doc-pagination__label">Next</span>
+          <span class="doc-pagination__title">Installation</span>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- ============ TOC ============ -->
+    <aside class="doc-toc" id="docToc">
+      <div class="doc-toc__label">On this page</div>
+      <nav class="doc-toc__list" id="docTocList"></nav>
+    </aside>
+
+  </div>
+
+  <button class="doc-top" id="docTop" title="Back to top">↑</button>
+
+  <script src="assets/docs.js"></script>
+</body>
+</html>
